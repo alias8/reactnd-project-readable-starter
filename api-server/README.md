@@ -29,17 +29,31 @@ The following endpoints are available:
 
 | Endpoints       | Usage          | Params         |
 |-----------------|----------------|----------------|
-| `GET /categories` | Get all of the categories available for the app. List is found in `categories.js`. Feel free to extend this list as you desire. |  |
-| `GET /:category/posts` | Get all of the posts for a particular category. |  |
-| `GET /posts` | Get all of the posts. Useful for the main page when no category is selected. |  |
-| `POST /posts` | Add a new post. | **id** - UUID should be fine, but any unique id will work <br> **timestamp** - [Timestamp] Can in whatever format you like, you can use `Date.now()` if you like. <br> **title** - [String] <br> **body** - [String] <br> **author** - [String] <br> **category** -  Any of the categories listed in `categories.js`. Feel free to extend this list as you desire. |
-| `GET /posts/:id` | Get the details of a single post. | |
-| `POST /posts/:id` | Used for voting on a post. | **option** - [String]: Either `"upVote"` or `"downVote"`. |
-| `PUT /posts/:id` | Edit the details of an existing post. | **title** - [String] <br> **body** - [String] |
-| `DELETE /posts/:id` | Sets the deleted flag for a post to 'true'. <br> Sets the parentDeleted flag for all child comments to 'true'. | |
-| `GET /posts/:id/comments` | Get all the comments for a single post. | |
-| `POST /comments` | Add a comment to a post. | **id** - Any unique ID. As with posts, UUID is probably the best here. <br> **timestamp** - [Timestamp] Get this however you want. <br> **body** - [String] <br> **author** - [String] <br> **parentId** - Should match a post id in the database. |
-| `GET /comments/:id` | Get the details for a single comment. | |
-| `POST /comments/:id` | Used for voting on a comment. | **option** - [String]: Either `"upVote"` or `"downVote"`.  |
-| `PUT /comments/:id` | Edit the details of an existing comment. | **timestamp** - timestamp. Get this however you want. <br> **body** - [String] |
-| `DELETE /comments/:id` | Sets a comment's deleted flag to `true`. | &nbsp; |
+
+| 1`GET /categories` | Get all of the categories available for the app. List is found in `categories.js`. Feel free to extend this list as you desire. |  |
+
+| 2`GET /:category/posts` | Get all of the posts for a particular category. |  |
+
+| 3`GET /posts` | Get all of the posts. Useful for the main page when no category is selected. |  |
+
+| 4`POST /posts` | Add a new post. | **id** - UUID should be fine, but any unique id will work <br> **timestamp** - [Timestamp] Can in whatever format you like, you can use `Date.now()` if you like. <br> **title** - [String] <br> **body** - [String] <br> **author** - [String] <br> **category** -  Any of the categories listed in `categories.js`. Feel free to extend this list as you desire. |
+
+| 5`GET /posts/:id` | Get the details of a single post. | |
+
+| 6`POST /posts/:id` | Used for voting on a post. | **option** - [String]: Either `"upVote"` or `"downVote"`. |
+
+| 7`PUT /posts/:id` | Edit the details of an existing post. | **title** - [String] <br> **body** - [String] |
+
+| 8`DELETE /posts/:id` | Sets the deleted flag for a post to 'true'. <br> Sets the parentDeleted flag for all child comments to 'true'. | |
+
+| 9`GET /posts/:id/comments` | Get all the comments for a single post. | |
+
+| 10`POST /comments` | Add a comment to a post. | **id** - Any unique ID. As with posts, UUID is probably the best here. <br> **timestamp** - [Timestamp] Get this however you want. <br> **body** - [String] <br> **author** - [String] <br> **parentId** - Should match a post id in the database. |
+
+| 11`GET /comments/:id` | Get the details for a single comment. | |
+
+| 12`POST /comments/:id` | Used for voting on a comment. | **option** - [String]: Either `"upVote"` or `"downVote"`.  |
+
+| 13`PUT /comments/:id` | Edit the details of an existing comment. | **timestamp** - timestamp. Get this however you want. <br> **body** - [String] |
+
+| 14`DELETE /comments/:id` | Sets a comment's deleted flag to `true`. | &nbsp; |
