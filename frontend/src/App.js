@@ -11,13 +11,13 @@ const Home = () => (
     <div>
         <h2>Home</h2>
     </div>
-)
+);
 
 const About = () => (
     <div>
         <h2>About</h2>
     </div>
-)
+);
 
 const BasicExample = () => (
     <Router>
@@ -35,5 +35,5 @@ const BasicExample = () => (
             <Route path="/categories" component={Categories}/>
         </div>
     </Router>
-)
+);
 export default BasicExample

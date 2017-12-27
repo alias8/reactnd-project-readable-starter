@@ -33,12 +33,15 @@ export class Categories extends React.Component {
                             {this.state.posts.map((post, index) => {
                                 const url = post.title.replace(/ /g, '_');
                                 const path = `${this.props.match.url}/${url}`
+                              const props = post;
                                 return (
                                     <li key={index}>
                                         <Link to={path}>
                                             {post.title}
                                         </Link>
-                                        <Route path={path} component={Child}/>
+                                        <Route path={path} render={(routeProps) => (
+                                          <Child {...routeProps} {...props} />
+                                        )}/>
                                     </li>
                                 )
                             })}
@@ -55,11 +58,19 @@ export class Categories extends React.Component {
     }
 }
 
-const Child = ({ match }) => (
-    <div>
-        <h3>ID: {match.params}</h3>
-    </div>
-)
+export class Child extends React.Component {
+    constructor() {
+        super()
+    }
+
+    render() {
+        const a = 2;
+        return (<div>dsad</div>)
+    }
+
+}
+
+
 
 const api = 'http://localhost:3001';
 const header = {
