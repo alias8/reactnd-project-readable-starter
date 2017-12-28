@@ -2,5 +2,8 @@
   "scripts": {
     "frontend": "cd frontend && yarn run react-scripts start",
     "server": "cd api-server && node server"
+  },
+  "dependencies": {
+    "react-redux": "^5.0.6"
   }
 }
