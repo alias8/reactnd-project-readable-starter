@@ -1,14 +1,37 @@
-import React, { Component } from 'react'
+import * as React from 'react'
 import { Route, } from 'react-router-dom'
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom'
 
 import Categories from "./Categories";
 import * as API from './api'
 import { getPosts } from './actions'
 import { Post } from "./Post";
+import { Component } from "react";
+import { connect, DispatchProp, MapStateToProps } from "react-redux";
+import { IPost } from "./types";
+import { RootState } from './reducers/top';
 
-class App extends Component {
+interface IState {
+
+}
+
+interface IMappedProps {
+    posts: IPost[],
+    match: any
+}
+
+interface IOwnProps {
+
+}
+
+type IProps = IOwnProps & IMappedProps;
+
+interface IModifiedPost extends IPost {
+    path: string
+}
+
+
+class App extends Component<IProps, IState> {
     componentDidMount() {
         API.fetchPosts()
             .then(result => {
@@ -18,15 +41,14 @@ class App extends Component {
 
     render() {
         let routes;
-        let posts;
-        let titles;
+        let posts: IModifiedPost[];
         if (this.props.posts) {
             posts = this.props.posts.map(post => {
                 const url = post.title.replace(/ /g, "_");
                 return {
                     ...post,
                     path: `${this.props.match.path}${post.category}/${url}`
-                }
+                };
             });
             routes = posts.map((post, index) => <Route key={post.id} exact path={post.path} render={(routeProps) => (
                 <Post {...routeProps} post={posts[index]}/>
@@ -43,8 +65,7 @@ class App extends Component {
     }
 }
 
-
-const mapStateToProps = (state, props) => ({
+const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps> = (state: RootState, props: IProps) => ({
     posts: state.posts.posts
 });
 

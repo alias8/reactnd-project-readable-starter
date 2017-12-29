@@ -1,14 +1,14 @@
-import React from 'react'
+import * as React from 'react'
 
 export class Category extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
     }
 
     render() {
         return (
             <div>
-                {this.props.}
+                hello from category
             </div>
         );
     }

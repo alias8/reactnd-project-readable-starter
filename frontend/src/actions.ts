@@ -5,3 +5,8 @@ export function getPosts(posts) {
 
     }
 }
+
+export interface IAction {
+    type: string;
+    [propName: string]: any;
+}

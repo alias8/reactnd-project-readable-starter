@@ -1,3 +1,5 @@
+import { IComment, IPost } from "./types";
+
 const api = 'http://localhost:3001';
 const header = {
     Accept: 'application/json',
@@ -18,7 +20,7 @@ export function fetchCategories() {
     });
 }
 
-export function fetchPosts() {
+export function fetchPosts(): Promise<IPost[]> {
     return new Promise((resolve, reject) => {
         fetch(`${api}/posts`,
             {
@@ -31,7 +33,7 @@ export function fetchPosts() {
     });
 }
 
-export function getCommentsForPost(id) {
+export function getCommentsForPost(id: string): Promise<IComment> {
     return new Promise((resolve, reject) => {
         fetch(`${api}/posts/${id}/comments`,
             {
@@ -44,9 +46,9 @@ export function getCommentsForPost(id) {
     });
 }
 
-export function postCommentToPost(id, author, body, parentId) {
+export function postCommentToPost(id: string, author: string, body: string, parentId: string) {
     return new Promise((resolve, reject) => {
-        const body = {
+        const bodyParam = {
             id,
             author,
             body,
@@ -57,7 +59,7 @@ export function postCommentToPost(id, author, body, parentId) {
             {
                 method: 'POST',
                 headers: header,
-                body: body,
+                body: bodyParam,
             })
             .then(result => result.json())
             .then(data => resolve(data))
