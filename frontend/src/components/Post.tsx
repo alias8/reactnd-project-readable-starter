@@ -22,7 +22,7 @@ interface IOwnProps {
 type IProps = IOwnProps & IMappedProps;
 
 export class Post extends React.Component<IProps, IState> {
-    constructor(props: IOwnProps) {
+    constructor(props: IProps) {
         super(props);
         this.state = {
             comments: [],

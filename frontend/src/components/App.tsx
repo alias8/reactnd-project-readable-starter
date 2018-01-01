@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Route } from 'react-router-dom';
+import { NavLink, Route, Link } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 
 import PostList from './PostList';
@@ -8,12 +8,12 @@ import { getPosts } from '../actions/actions';
 import { Post } from './Post';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
-import { IPost } from '../types/types';
+import { ICategory, IPost } from '../types/types';
 import { RootState } from '../reducers/top';
 import { RouteComponentProps } from 'react-router';
 
 interface IState {
-
+    categories: ICategory[];
 }
 
 interface IMappedProps {
@@ -31,15 +31,43 @@ export interface IModifiedPost extends IPost {
 }
 
 class App extends Component<IProps, IState> {
+    constructor(props: IProps) {
+        super(props);
+        this.state = {
+            categories: []
+        };
+    }
+
     componentDidMount() {
         API.fetchPosts()
             .then(result => {
                 this.props.dispatch(getPosts(result));
             });
+        API.fetchCategories()
+            .then(result => {
+                this.setState({
+                    categories: result
+                });
+            });
     }
 
     render() {
-        let routes;
+        let categoryLinks;
+        if (this.state.categories.length > 0) {
+            categoryLinks = this.state.categories.map((category, index) => (
+                <NavLink
+                    to={`${this.props.match.path}${category.name}`}
+                    key={index}
+                    activeStyle={{
+                        fontWeight: 'bold',
+                        color: 'red'
+                    }}
+                >{category.name}
+                </NavLink>
+            ));
+        }
+
+        let routesForSpecificPost;
         let modifiedPosts: IModifiedPost[];
         if (this.props.posts) {
             modifiedPosts = this.props.posts.map(post => {
@@ -49,7 +77,7 @@ class App extends Component<IProps, IState> {
                     path: `${this.props.match.path}${post.category}/${url}`
                 };
             });
-            routes = modifiedPosts.map((post, index) => (
+            routesForSpecificPost = modifiedPosts.map((post, index) => (
                 <Route
                     key={post.id}
                     exact={true}
@@ -61,10 +89,11 @@ class App extends Component<IProps, IState> {
         }
         return (
             <div>
-                {routes}
+                {categoryLinks}
+                {routesForSpecificPost}
+
                 {/*this route is rendered on the default page load "/". It will list the posts*/}
                 <Route
-                    exact={true}
                     path={this.props.match.path}
                     render={(routeProps) => (
                         <PostList {...routeProps} posts={modifiedPosts}/>
@@ -79,4 +108,4 @@ const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (st
     posts: state.posts.posts
 });
 
-export default withRouter(connect(mapStateToProps)(App));
+export default withRouter<any>(connect(mapStateToProps)(App));

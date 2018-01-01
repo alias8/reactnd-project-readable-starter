@@ -20,3 +20,8 @@ export interface IComment {
     timestamp: number;
     voteScore: number;
 }
+
+export interface ICategory {
+    name: string;
+    path: string;
+}

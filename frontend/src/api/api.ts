@@ -1,4 +1,4 @@
-import { IComment, IPost } from '../types/types';
+import { ICategory, IComment, IPost } from '../types/types';
 import uuid from 'uuid/v4.js';
 
 const api = 'http://localhost:3001';
@@ -8,7 +8,7 @@ const header = {
     'Content-Type': 'application/json',
 };
 
-export function fetchCategories() {
+export function fetchCategories(): Promise<ICategory[]> {
     return new Promise((resolve, reject) => {
         fetch(`${api}/categories`, {
                 method: 'GET',
