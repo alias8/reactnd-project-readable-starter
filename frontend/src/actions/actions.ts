@@ -3,7 +3,7 @@ export function getPosts(posts) {
         type: 'GET_POSTS',
         posts: posts
 
-    }
+    };
 }
 
 export interface IAction {

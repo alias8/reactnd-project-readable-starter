@@ -1,10 +1,10 @@
-import { IPost } from "../types";
-import { Reducer } from "redux";
-import { IAction } from "../actions";
+import { IPost } from '../types/types';
+import { Reducer } from 'redux';
+import { IAction } from '../actions/actions';
 
-export type PostState = Readonly<{
+export type PostState = {
     posts: IPost[]
-}>;
+};
 
 const initialState: PostState = {
     posts: []
@@ -16,10 +16,10 @@ const reducer: Reducer<PostState> = (state = initialState, action: IAction) => {
             return {
                 ...state,
                 posts: action.posts
-            }
+            };
         default:
-            return state
+            return state;
     }
-}
+};
 
 export default reducer;

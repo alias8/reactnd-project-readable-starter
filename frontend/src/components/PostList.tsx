@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom'
-import * as React from 'react'
-import { Component } from "react";
+import { Link } from 'react-router-dom';
+import * as React from 'react';
+import { Component } from 'react';
+import { IModifiedPost } from './App';
 
 interface IState {
 
@@ -11,16 +12,12 @@ interface IMappedProps {
 }
 
 interface IOwnProps {
-    posts: any
+    posts: IModifiedPost[];
 }
 
 type IProps = IOwnProps & IMappedProps;
 
-class Categories extends Component<IProps, IState> {
-    componentWillReceiveProps(nextProps) {
-        const b = 2;
-    }
-
+class PostList extends Component<IProps, IState> {
     render() {
         return (
             <div>
@@ -34,13 +31,13 @@ class Categories extends Component<IProps, IState> {
                 {post.title}
                 </Link>
                 </li>
-            )
+            );
             })}
             </ul>
         }
         </div>
-    )
+    );
     }
 }
 
-export default Categories
+export default PostList;

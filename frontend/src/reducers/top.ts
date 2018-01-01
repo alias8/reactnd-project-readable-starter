@@ -1,10 +1,10 @@
-import { PostState } from "./Posts";
-import { combineReducers, Reducer } from "redux";
-import posts from './Posts'
+import { PostState } from './Posts';
+import { combineReducers, Reducer } from 'redux';
+import posts from './Posts';
 
-export type RootState = Readonly<{
+export type RootState = {
     posts: PostState
-}>;
+};
 
 const topLevelReducer: Reducer<RootState> = combineReducers<RootState>({
     posts: posts
