@@ -5,7 +5,7 @@ import { IModifiedPost } from './App';
 import { RouteComponentProps } from 'react-router';
 
 interface IState {
-
+    sortMethod: string;
 }
 
 interface IMappedProps {
@@ -19,33 +19,54 @@ interface IOwnProps {
 type IProps = IOwnProps & IMappedProps & RouteComponentProps<{}>;
 
 class PostList extends Component<IProps, IState> {
+    VOTE_SCORE: string;
+    TIME_STAMP: string;
+
     constructor(props: IProps) {
         super(props);
-        const VOTE_SCORE = 'VOTE_SCORE';
-        const TIME_STAMP = 'TIME_STAMP';
+        this.VOTE_SCORE = 'VOTE_SCORE';
+        this.TIME_STAMP = 'TIME_STAMP';
         this.state = {
-            sortMethod: VOTE_SCORE
+            sortMethod: this.VOTE_SCORE
         };
     }
+
+    handleChange = (e) => {
+        this.setState({
+            sortMethod: e.target.value
+        })
+    }
+
     render() {
         return (
             <div>
                 <h2>Posts</h2>
                 {this.props.posts &&
-                <ul>
-                    {this.props.posts
-                        .filter(post => (this.props.location.pathname === '/' ?
-                            true : post.path.match(/(\/.+)\//)[1] === this.props.location.pathname))
-                        .map((post, index) => {
-                            return (
-                                <li key={post.id}>
-                                    <Link to={post.path}>
-                                        {post.title}
-                                    </Link>
-                                </li>
-                            );
-                        })}
-                </ul>
+                <div>
+                    <div>sort by:</div>
+                    <select value={this.state.sortMethod} onChange={this.handleChange}>
+                        <option value={this.VOTE_SCORE}>Score (highest first)</option>
+                        <option value={this.TIME_STAMP}>Time (newest first)</option>
+                    </select>
+                    <ul>
+                        {this.props.posts
+                            .filter(post => (this.props.location.pathname === '/' ?
+                                true : post.path.match(/(\/.+)\//)[1] === this.props.location.pathname))
+                            .sort((a, b) => this.state.sortMethod === this.VOTE_SCORE ? b.voteScore - a.voteScore : b.timestamp - a.timestamp)
+                            .map((post, index) => {
+                                return (
+                                    <li key={post.id}>
+                                        <Link to={post.path}>
+                                            {post.title}
+                                        </Link>
+                                        <div>submitted {(new Date(post.timestamp)).toLocaleString()} hours ago by {post.author} to {post.category}</div>
+                                        <div>{post.voteScore} upvotes</div>
+                                        <div>{post.commentCount} comments</div>
+                                    </li>
+                                );
+                            })}
+                    </ul>
+                </div>
                 }
             </div>
         );
