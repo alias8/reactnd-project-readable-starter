@@ -9,56 +9,48 @@ const header = {
 };
 
 export function fetchCategories(): Promise<ICategory[]> {
-    return new Promise((resolve, reject) => {
-        fetch(`${api}/categories`, {
-                method: 'GET',
-                headers: header
-            })
-            .then(result => result.json())
-            .then(data => resolve(data.categories))
-            .catch(error => reject(error));
-    });
+    return fetch(`${api}/categories`, {
+        method: 'GET',
+        headers: header
+    })
+        .then(result => result.json())
+        .then(data => data.categories)
+        .catch(error => error);
 }
 
 export function fetchPosts(): Promise<IPost[]> {
-    return new Promise((resolve, reject) => {
-        fetch(`${api}/posts`, {
-                method: 'GET',
-                headers: header
-            })
-            .then(result => result.json())
-            .then(data => resolve(data))
-            .catch(error => reject(error));
-    });
+    return fetch(`${api}/posts`, {
+        method: 'GET',
+        headers: header
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
 }
 
 export function getCommentsForPost(id: string): Promise<IComment[]> {
-    return new Promise((resolve, reject) => {
-        fetch(`${api}/posts/${id}/comments`, {
-                method: 'GET',
-                headers: header
-            })
-            .then(result => result.json())
-            .then(data => resolve(data))
-            .catch(error => reject(error));
-    });
+    return fetch(`${api}/posts/${id}/comments`, {
+        method: 'GET',
+        headers: header
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
 }
 
 export function postCommentToPost(author: string, body: string, parentId: string): Promise<IComment> {
-    return new Promise((resolve, reject) => {
-        fetch(`${api}/comments`, {
-            method: 'POST',
-            headers: header,
-            body: JSON.stringify({
-                id: uuid(),
-                timestamp: Date.now(),
-                body,
-                author,
-                parentId
-            })
+    return fetch(`${api}/comments`, {
+        method: 'POST',
+        headers: header,
+        body: JSON.stringify({
+            id: uuid(),
+            timestamp: Date.now(),
+            body,
+            author,
+            parentId
         })
-            .then(result => result.json())
-            .then(data => resolve(data))
-            .catch(error => reject(error));
-    });
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
 }
