@@ -85,3 +85,18 @@
   width: 300px;
   font-size: medium;
 }
+
+.list-of-posts {
+  display: inline-block;
+}
+
+.submit-post-button {
+  position: relative;
+  display: inline-block;
+  bottom: 100px;
+  left: 100px;
+}
+
+.add-new-post-input {
+  display: block;
+}

@@ -54,3 +54,21 @@ export function postCommentToPost(author: string, body: string, parentId: string
         .then(data => data)
         .catch(error => error);
 }
+
+export function addNewPost(title: string, body: string, author: string, category: string): Promise<IComment> {
+    return fetch(`${api}/comments`, {
+        method: 'POST',
+        headers: header,
+        body: JSON.stringify({
+            id: uuid(),
+            timestamp: Date.now(),
+            title,
+            body,
+            author,
+            category
+        })
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
+}

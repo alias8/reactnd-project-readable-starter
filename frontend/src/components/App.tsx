@@ -10,7 +10,8 @@ import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { ICategory, IPost } from '../types/types';
 import { RootState } from '../reducers/top';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, Switch } from 'react-router';
+import { AddNewPost } from './AddNewPost';
 
 interface IState {
     categories: ICategory[];
@@ -52,18 +53,33 @@ class App extends Component<IProps, IState> {
     }
 
     render() {
-        let categoryLinks;
+        let categoryLinks = [];
         if (this.state.categories.length > 0) {
-            categoryLinks = this.state.categories.map((category, index) => (
+            categoryLinks.push(
                 <NavLink
-                    to={`${this.props.match.path}${category.name}`}
-                    key={index}
+                    to={`${this.props.match.path}`}
+                    exact={true}
+                    key="all"
                     activeStyle={{
                         fontWeight: 'bold',
                         color: 'red'
                     }}
-                >{category.name}
+                >All
                 </NavLink>
+            );
+
+            this.state.categories.forEach((category, index) => (
+                categoryLinks.push(
+                    <NavLink
+                        to={`${this.props.match.path}${category.name}`}
+                        key={index}
+                        activeStyle={{
+                            fontWeight: 'bold',
+                            color: 'red'
+                        }}
+                    >{category.name}
+                    </NavLink>
+                )
             ));
         }
 
@@ -90,15 +106,26 @@ class App extends Component<IProps, IState> {
         return (
             <div>
                 {categoryLinks}
-                {routesForSpecificPost}
+                <div>
+                    <Switch>
+                        {/*these routes are for the individual post*/}
+                        {routesForSpecificPost}
 
-                {/*this route is rendered on the default page load "/". It will list the posts*/}
-                <Route
-                    path={this.props.match.path}
-                    render={(routeProps) => (
-                        <PostList {...routeProps} posts={modifiedPosts}/>
-                    )}
-                />
+                        {/*this route is rendered on the default page load "/". It will list the posts*/}
+                        <Route
+                            path={`${this.props.match.path}submit`}
+                            exact={true}
+                            component={AddNewPost}
+                        />
+                        <Route
+                            path={this.props.match.path}
+                            exact={false}
+                            render={(routeProps) => (
+                                <PostList {...routeProps} posts={modifiedPosts}/>
+                            )}
+                        />
+                    </Switch>
+                </div>
             </div>
         );
     }
