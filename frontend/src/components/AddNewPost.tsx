@@ -2,15 +2,17 @@ import * as React from 'react';
 import * as API from '../api/api';
 import '../styles/App.css';
 import { ChangeEvent } from 'react';
-import { Redirect } from 'react-router';
+import { Redirect, RouteComponentProps } from 'react-router';
 import { ICategory, IComment, IPost } from '../types/types';
+import { getPosts } from '../actions/actions';
 
 interface IState {
     title: string;
     text: string;
     author: string;
-    category: string;
+    chosenCategory: string;
     categories: ICategory[];
+    postSubmitted: boolean;
 }
 
 interface IMappedProps {
@@ -21,7 +23,7 @@ interface IOwnProps {
 
 }
 
-type IProps = IOwnProps & IMappedProps;
+type IProps = IOwnProps & IMappedProps & RouteComponentProps<{}>;
 
 export class AddNewPost extends React.Component<IProps, IState> {
     constructor(props: IProps) {
@@ -30,8 +32,9 @@ export class AddNewPost extends React.Component<IProps, IState> {
             title: '',
             text: '',
             author: '',
-            category: '',
-            categories: []
+            chosenCategory: '',
+            categories: [],
+            postSubmitted: false
         };
     }
 
@@ -48,9 +51,11 @@ export class AddNewPost extends React.Component<IProps, IState> {
     handleSubmit = (event) => {
         event.preventDefault();
         event.stopPropagation();
-        API.addNewPost(this.state.title, this.state.text, this.state.author, this.state.category)
+        API.addNewPost(this.state.title, this.state.text, this.state.author, this.state.chosenCategory)
             .then((result: IComment) => {
-                const a = 2;
+                this.setState({
+                    postSubmitted: true
+                });
             });
     }
 
@@ -72,50 +77,63 @@ export class AddNewPost extends React.Component<IProps, IState> {
         });
     }
 
-    handleCategoryChange = (event: MouseEvent<HTMLButtonElement>) => {
+    handleCategoryChange = (event: React.MouseEvent<HTMLButtonElement>) => {
         this.setState({
-            text: event.currentTarget.value
+            chosenCategory: event.currentTarget.innerHTML
         });
     }
 
     render() {
-        this.state.categories.map(category => (
-            <button onClick={this.handleCategoryChange}>{category.name}</button>
-        ))
+        const categories =
+            this.state.categories.map(category => {
+                return (
+                    <button
+                        className={category.name === this.state.chosenCategory ? 'clicked-category' : ''}
+                        onClick={this.handleCategoryChange}
+                        key={category.name}
+                    >{category.name}
+                    </button>
+                    );
+            });
 
-        return (
-            <div>
-                Submit a new post:
-                <form onSubmit={this.handleSubmit}>
-                    <label className="add-new-post-input">
-                        Title:
-                        <input
-                            name="title"
-                            value={this.state.title}
-                            onChange={this.handleTitleChange}
-                        />
-                    </label>
-                    <label className="add-new-post-input">
-                        Text:
-                        <textarea
-                            name="text"
-                            onChange={this.handleTextChange}
-                        />
-                    </label>
-                    <label className="add-new-post-input">
-                        Author:
-                        <input
-                            type="text"
-                            name="author"
-                            onChange={this.handleAuthorChange}
-                        />
-                    </label>
-                    <input type="submit" value="Submit"/>
-                </form>
-                <div>Choose a category to post to:</div>
-
-            </div>
-
-        );
+        if (this.state.postSubmitted) {
+            return (
+                <Redirect to={`/${this.state.chosenCategory}/${this.state.title.replace(/ /g, '_')}`}/>
+            );
+        } else {
+            return (
+                <div>
+                    Submit a new post:
+                    <form onSubmit={this.handleSubmit}>
+                        <label className="add-new-post-input">
+                            Title:
+                            <input
+                                name="title"
+                                value={this.state.title}
+                                onChange={this.handleTitleChange}
+                            />
+                        </label>
+                        <label className="add-new-post-input">
+                            Text:
+                            <textarea
+                                name="text"
+                                onChange={this.handleTextChange}
+                            />
+                        </label>
+                        <label className="add-new-post-input">
+                            Author:
+                            <input
+                                type="text"
+                                name="author"
+                                onChange={this.handleAuthorChange}
+                            />
+                        </label>
+                        <input type="submit" value="Submit"/>
+                    </form>
+                    <div>Choose a category to post to:</div>
+                    {categories}
+                </div>
+            );
+        }
     }
 }

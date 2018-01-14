@@ -100,3 +100,8 @@
 .add-new-post-input {
   display: block;
 }
+
+.clicked-category {
+  border: 10px;
+  border-color: darkblue;
+}
