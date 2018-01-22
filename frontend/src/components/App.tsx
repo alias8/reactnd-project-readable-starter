@@ -18,7 +18,7 @@ interface IState {
 }
 
 interface IMappedProps {
-    posts: IPost[];
+    posts: IModifiedPost[];
 }
 
 interface IOwnProps {
@@ -52,76 +52,74 @@ class App extends Component<IProps, IState> {
             });
     }
 
-    render() {
+    /*
+    * Returns a react-router component that renders a post when the url matches
+    * the post's title (spaces are replaced with an underscore)
+    * */
+    formRoutesFromPosts() {
+        return this.props.posts.map((post, index) => (
+            <Route
+                key={post.id}
+                exact={true}
+                path={post.path}
+                render={(routeProps) => (
+                    <Post {...routeProps} post={post}/>
+                )}
+            />));
+
+    }
+
+    formLinksFromCategories() {
         let categoryLinks = [];
-        if (this.state.categories.length > 0) {
+        categoryLinks.push(
+            <NavLink
+                to={`/`}
+                exact={true}
+                key="all"
+                activeStyle={{
+                    fontWeight: 'bold',
+                    color: 'red'
+                }}
+            >All
+            </NavLink>
+        );
+
+        this.state.categories.forEach((category, index) => (
             categoryLinks.push(
                 <NavLink
-                    to={`${this.props.match.path}`}
-                    exact={true}
-                    key="all"
+                    to={`/${category.name}`}
+                    key={index}
                     activeStyle={{
                         fontWeight: 'bold',
                         color: 'red'
                     }}
-                >All
+                >{category.name}
                 </NavLink>
-            );
+            )
+        ));
+        return categoryLinks;
+    }
 
-            this.state.categories.forEach((category, index) => (
-                categoryLinks.push(
-                    <NavLink
-                        to={`${this.props.match.path}${category.name}`}
-                        key={index}
-                        activeStyle={{
-                            fontWeight: 'bold',
-                            color: 'red'
-                        }}
-                    >{category.name}
-                    </NavLink>
-                )
-            ));
-        }
-
-        let routesForSpecificPost;
-        let modifiedPosts: IModifiedPost[];
-        if (this.props.posts) {
-            modifiedPosts = this.props.posts.map(post => {
-                const url = post.title.replace(/ /g, '_');
-                return {
-                    ...post,
-                    path: `${this.props.match.path}${post.category}/${url}`
-                };
-            });
-            routesForSpecificPost = modifiedPosts.map((post, index) => (
-                <Route
-                    key={post.id}
-                    exact={true}
-                    path={post.path}
-                    render={(routeProps) => (
-                        <Post {...routeProps} post={modifiedPosts[index]}/>
-                    )}
-                />));
-        }
+    render() {
         return (
             <div>
-                {categoryLinks}
+                {this.formLinksFromCategories()}
                 <div>
                     <Switch>
                         {/*these routes are for the individual post*/}
-                        {routesForSpecificPost}
+                        {this.formRoutesFromPosts()}
 
                         {/*this route is rendered on the default page load "/". It will list the posts*/}
                         <Route
-                            path={`${this.props.match.path}submit`}
+                            path={`/submit`}
                             exact={true}
                             component={AddNewPost}
                         />
                         <Route
-                            path={this.props.match.path}
+                            path={'/'}
                             exact={false}
                             render={(routeProps) => (
-                                <PostList {...routeProps} posts={modifiedPosts}/>
+                                <PostList {...routeProps}/>
                             )}
                         />
                     </Switch>

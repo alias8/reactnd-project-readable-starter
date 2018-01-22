@@ -4,6 +4,7 @@ import '../styles/App.css';
 import { ChangeEvent } from 'react';
 import { Redirect } from 'react-router';
 import { IComment, IPost } from '../types/types';
+import { IModifiedPost } from "./App";
 
 interface IState {
     comments: IComment[];
@@ -16,7 +17,7 @@ interface IMappedProps {
 }
 
 interface IOwnProps {
-    post: IPost;
+    post: IModifiedPost;
 }
 
 type IProps = IOwnProps & IMappedProps;
