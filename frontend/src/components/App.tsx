@@ -53,6 +53,54 @@ class App extends Component<IProps, IState> {
     }
 
     render() {
+        let routesForSpecificPost;
+        let modifiedPosts: IModifiedPost[];
+        if (this.props.posts) {
+            modifiedPosts = this.props.posts.map(post => {
+                const url = post.title.replace(/ /g, '_');
+                return {
+                    ...post,
+                    path: `${this.props.match.path}${post.category}/${url}`
+                };
+            });
+            routesForSpecificPost = modifiedPosts.map((post, index) => (
+                <Route
+                    key={post.id}
+                    exact={true}
+                    path={post.path}
+                    render={(routeProps) => (
+                        <Post {...routeProps} post={modifiedPosts[index]}/>
+                    )}
+                />));
+        }
+        return (
+            <div>
+                {this.renderCategoryLinks()}
+                <div>
+                    <Switch>
+                        {/*these routes are for the individual post*/}
+                        {routesForSpecificPost}
+
+                        {/*this route is rendered on the default page load "/". It will list the posts*/}
+                        <Route
+                            path={`${this.props.match.path}submit`}
+                            exact={true}
+                            component={AddNewPost}
+                        />
+                        <Route
+                            path={this.props.match.path}
+                            exact={false}
+                            render={(routeProps) => (
+                                <PostList {...routeProps} posts={modifiedPosts}/>
+                            )}
+                        />
+                    </Switch>
+                </div>
+            </div>
+        );
+    }
+
+    renderCategoryLinks() {
         let categoryLinks = [];
         if (this.state.categories.length > 0) {
             categoryLinks.push(
@@ -82,52 +130,7 @@ class App extends Component<IProps, IState> {
                 )
             ));
         }
-
-        let routesForSpecificPost;
-        let modifiedPosts: IModifiedPost[];
-        if (this.props.posts) {
-            modifiedPosts = this.props.posts.map(post => {
-                const url = post.title.replace(/ /g, '_');
-                return {
-                    ...post,
-                    path: `${this.props.match.path}${post.category}/${url}`
-                };
-            });
-            routesForSpecificPost = modifiedPosts.map((post, index) => (
-                <Route
-                    key={post.id}
-                    exact={true}
-                    path={post.path}
-                    render={(routeProps) => (
-                        <Post {...routeProps} post={modifiedPosts[index]}/>
-                    )}
-                />));
-        }
-        return (
-            <div>
-                {categoryLinks}
-                <div>
-                    <Switch>
-                        {/*these routes are for the individual post*/}
-                        {routesForSpecificPost}
-
-                        {/*this route is rendered on the default page load "/". It will list the posts*/}
-                        <Route
-                            path={`${this.props.match.path}submit`}
-                            exact={true}
-                            component={AddNewPost}
-                        />
-                        <Route
-                            path={this.props.match.path}
-                            exact={false}
-                            render={(routeProps) => (
-                                <PostList {...routeProps} posts={modifiedPosts}/>
-                            )}
-                        />
-                    </Switch>
-                </div>
-            </div>
-        );
+        return categoryLinks;
     }
 }
 
