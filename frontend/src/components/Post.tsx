@@ -2,8 +2,9 @@ import * as React from 'react';
 import * as API from '../api/api';
 import '../styles/App.css';
 import { ChangeEvent } from 'react';
-import { Redirect } from 'react-router';
-import { IComment, IPost } from '../types/types';
+import { IComment } from '../types/types';
+import { IModifiedPost } from './App';
+import * as moment from 'moment';
 
 interface IState {
     comments: IComment[];
@@ -16,7 +17,7 @@ interface IMappedProps {
 }
 
 interface IOwnProps {
-    post: IPost;
+    post: IModifiedPost;
 }
 
 type IProps = IOwnProps & IMappedProps;
@@ -71,7 +72,7 @@ export class Post extends React.Component<IProps, IState> {
                     <div key={index} className="comment">
                         <div>Author: {comment.author}</div>
                         <div>Body: {comment.body}</div>
-                        <div>Timestamp: {comment.timestamp}</div>
+                        <div>Timestamp: {moment(comment.timestamp).fromNow()}</div>
                         <div>VoteScore: {comment.voteScore}</div>
                     </div>
                 );
@@ -84,8 +85,7 @@ export class Post extends React.Component<IProps, IState> {
                     <div className="post-vote-score">{this.props.post.voteScore}</div>
                     <div className="not-post-vote-score">
                         <div className="post-title">{this.props.post.title}</div>
-                        <div className="post-submitted-by">Submitted {this.props.post.timestamp} days ago
-                            by {this.props.post.author}</div>
+                        <div className="post-submitted-by">Submitted {this.props.post.timestamp} by {this.props.post.author}</div>
                         <div className="post-body">
                             {this.props.post.body}
                             {this.props.post.body}

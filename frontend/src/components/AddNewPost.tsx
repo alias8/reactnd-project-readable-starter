@@ -3,8 +3,7 @@ import * as API from '../api/api';
 import '../styles/App.css';
 import { ChangeEvent } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
-import { ICategory, IComment, IPost } from '../types/types';
-import { getPosts } from '../actions/actions';
+import { ICategory, IComment } from '../types/types';
 
 interface IState {
     title: string;

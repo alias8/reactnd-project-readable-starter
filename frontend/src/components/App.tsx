@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavLink, Route, Link } from 'react-router-dom';
+import { NavLink, Route} from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 
 import PostList from './PostList';
@@ -18,7 +18,7 @@ interface IState {
 }
 
 interface IMappedProps {
-    posts: IPost[];
+    posts: IModifiedPost[];
 }
 
 interface IOwnProps {
@@ -51,47 +51,74 @@ class App extends Component<IProps, IState> {
                 });
             });
     }
+    /*
+    * Returns a react-router component that renders a post when the url matches
+    * the post's title (spaces are replaced with an underscore)
+    * */
+    formRoutesFromPosts() {
+        return this.props.posts.map((post, index) => (
+            <Route
+                key={post.id}
+                exact={true}
+                path={post.path}
+                render={(routeProps) => (
+                    <Post {...routeProps} post={post}/>
+                )}
+            />));
+
+    }
+
+    formLinksFromCategories() {
+        let categoryLinks:any = [];
+        categoryLinks.push(
+            <NavLink
+                to={`/`}
+                exact={true}
+                key="all"
+                activeStyle={{
+                    fontWeight: 'bold',
+                    color: 'red'
+                }}
+            >All
+            </NavLink>
+        );
+
+        this.state.categories.forEach((category, index) => (
+            categoryLinks.push(
+                <NavLink
+                    to={`/${category.name}`}
+                    key={index}
+                    activeStyle={{
+                        fontWeight: 'bold',
+                        color: 'red'
+                    }}
+                >{category.name}
+                </NavLink>
+            )
+        ));
+        return categoryLinks;
+    }
 
     render() {
-        let routesForSpecificPost;
-        let modifiedPosts: IModifiedPost[];
-        if (this.props.posts) {
-            modifiedPosts = this.props.posts.map(post => {
-                const url = post.title.replace(/ /g, '_');
-                return {
-                    ...post,
-                    path: `${this.props.match.path}${post.category}/${url}`
-                };
-            });
-            routesForSpecificPost = modifiedPosts.map((post, index) => (
-                <Route
-                    key={post.id}
-                    exact={true}
-                    path={post.path}
-                    render={(routeProps) => (
-                        <Post {...routeProps} post={modifiedPosts[index]}/>
-                    )}
-                />));
-        }
         return (
             <div>
-                {this.renderCategoryLinks()}
+                {this.formLinksFromCategories()}
                 <div>
                     <Switch>
                         {/*these routes are for the individual post*/}
-                        {routesForSpecificPost}
+                        {this.formRoutesFromPosts()}
 
                         {/*this route is rendered on the default page load "/". It will list the posts*/}
                         <Route
-                            path={`${this.props.match.path}submit`}
+                            path={`/submit`}
                             exact={true}
                             component={AddNewPost}
                         />
                         <Route
-                            path={this.props.match.path}
+                            path={'/'}
                             exact={false}
                             render={(routeProps) => (
-                                <PostList {...routeProps} posts={modifiedPosts}/>
+                                <PostList {...routeProps}/>
                             )}
                         />
                     </Switch>
@@ -101,7 +128,7 @@ class App extends Component<IProps, IState> {
     }
 
     renderCategoryLinks() {
-        let categoryLinks = [];
+        let categoryLinks: any = [];
         if (this.state.categories.length > 0) {
             categoryLinks.push(
                 <NavLink

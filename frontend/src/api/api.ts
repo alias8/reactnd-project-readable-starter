@@ -1,5 +1,6 @@
 import { ICategory, IComment, IPost } from '../types/types';
-import uuid from 'uuid/v4.js';
+import * as uuid from 'uuid/v4.js';
+import * as moment from 'moment';
 
 const api = 'http://localhost:3001';
 const header = {
@@ -64,7 +65,7 @@ export function postCommentToPost(author: string, body: string, parentId: string
         headers: header,
         body: JSON.stringify({
             id: uuid(),
-            timestamp: Date.now(),
+            timestamp: moment().unix() * 1000,
             body,
             author,
             parentId
@@ -91,7 +92,7 @@ export function addNewPost(title: string, body: string, author: string, category
         headers: header,
         body: JSON.stringify({
             id: uuid(),
-            timestamp: Date.now(),
+            timestamp: moment().unix() * 1000,
             title,
             body,
             author,
@@ -102,7 +103,6 @@ export function addNewPost(title: string, body: string, author: string, category
         .then(data => data)
         .catch(error => error);
 }
-
 
 //
 //     GET /:category/posts

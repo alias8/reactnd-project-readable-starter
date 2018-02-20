@@ -2,18 +2,21 @@ import { Link } from 'react-router-dom';
 import * as React from 'react';
 import { Component } from 'react';
 import { IModifiedPost } from './App';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, withRouter } from 'react-router';
+import { connect, MapStateToProps } from 'react-redux';
+import { RootState } from '../reducers/top';
+import * as moment from 'moment';
 
 interface IState {
     sortMethod: string;
 }
 
 interface IMappedProps {
-
+    posts: IModifiedPost[];
 }
 
 interface IOwnProps {
-    posts: IModifiedPost[];
+
 }
 
 type IProps = IOwnProps & IMappedProps & RouteComponentProps<{}>;
@@ -31,9 +34,9 @@ class PostList extends Component<IProps, IState> {
         };
     }
 
-    handleChange = (e) => {
+    handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
         this.setState({
-            sortMethod: e.target.value
+            sortMethod: e.currentTarget.value
         });
     }
 
@@ -60,7 +63,7 @@ class PostList extends Component<IProps, IState> {
                                             <Link to={post.path}>
                                                 {post.title}
                                             </Link>
-                                            <div>submitted {(new Date(post.timestamp)).toLocaleString()} hours ago by {post.author} to {post.category}</div>
+                                            <div>submitted {moment(post.timestamp).fromNow()} by {post.author} to {post.category}</div>
                                             <div>{post.voteScore} upvotes</div>
                                             <div>{post.commentCount} comments</div>
                                         </li>
@@ -81,4 +84,8 @@ class PostList extends Component<IProps, IState> {
     }
 }
 
-export default PostList;
+const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
+    posts: state.posts.posts
+});
+
+export default withRouter<any>(connect(mapStateToProps)(PostList));
