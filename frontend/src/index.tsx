@@ -9,11 +9,28 @@ import { Provider } from 'react-redux';
 import {
     BrowserRouter as Router,
     Route } from 'react-router-dom';
+import { Switch } from 'react-router';
+import { NewPost } from './components/NewPost';
+import { NotFoundPage } from './components/NotFoundPage';
+import { PostPage } from './components/PostPage';
+import Category from './components/Category';
+import { EditPost } from './components/EditPost';
+import { EditComment } from './components/EditComment';
+import { NewComment } from './components/NewComment';
 
 ReactDOM.render(
     <Provider store={store}>
         <Router>
-            <Route path="/" component={App}/>
+            <Switch>
+                <Route exact={true} path={'/new'} component={NewPost}/>
+                {/*<Route exact={true} path={'/:category/posts/:id/new_comment'} component={NewComment}/>*/}
+                <Route exact={true} path={'/'} component={App}/>
+                <Route exact={true} path={'/404'} component={NotFoundPage}/>
+                <Route exact={true} path={'/:category/posts'} component={Category}/>
+                <Route exact={true} path={'/:category/posts/:id'} component={PostPage}/>
+                <Route exact={true} path={'/:category/posts/:id/edit'} component={EditPost}/>
+                {/*<Route exact={true} path={'/comments/:comment_id/edit'} component={EditComment}/>*/}
+            </Switch>
         </Router>
     </Provider>,
     document.getElementById('root'));

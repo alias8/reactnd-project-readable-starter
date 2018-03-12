@@ -108,16 +108,30 @@ export function addNewPost(title: string, body: string, author: string, category
 //     GET /:category/posts
 // USAGE:
 //     Get all of the posts for a particular category
-//
-
-//
-
-//
+export function getPostsForOneCategory(category: string): Promise<IPost[]> {
+    return fetch(`${api}/${category}/posts`, {
+        method: 'GET',
+        headers: header
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
+}
 
 //
 //     GET /posts/:id
 // USAGE:
 //     Get the details of a single post
+export function getDetailsForOnePost(id: string): Promise<IPost> {
+    return fetch(`${api}/posts/${id}`, {
+        method: 'GET',
+        headers: header
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
+}
+
 //
 // POST /posts/:id
 // USAGE:

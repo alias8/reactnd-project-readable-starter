@@ -1,24 +1,25 @@
 import * as React from 'react';
-import { NavLink, Route} from 'react-router-dom';
+import { Link, NavLink, Route } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 
-import PostList from './PostList';
+import PostList from './Category';
 import * as API from '../api/api';
 import { getPosts } from '../actions/actions';
-import { Post } from './Post';
+import { PostPage } from './PostPage';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { ICategory, IPost } from '../types/types';
 import { RootState } from '../reducers/top';
 import { RouteComponentProps, Switch } from 'react-router';
-import { AddNewPost } from './AddNewPost';
+import { NewPost } from './NewPost';
+import * as moment from 'moment';
 
 interface IState {
     categories: ICategory[];
 }
 
 interface IMappedProps {
-    posts: IModifiedPost[];
+    posts: IPost[];
 }
 
 interface IOwnProps {
@@ -26,10 +27,6 @@ interface IOwnProps {
 }
 
 type IProps = IOwnProps & IMappedProps & DispatchProp<{}> & RouteComponentProps<{}>;
-
-export interface IModifiedPost extends IPost {
-    path: string;
-}
 
 class App extends Component<IProps, IState> {
     constructor(props: IProps) {
@@ -51,30 +48,14 @@ class App extends Component<IProps, IState> {
                 });
             });
     }
-    /*
-    * Returns a react-router component that renders a post when the url matches
-    * the post's title (spaces are replaced with an underscore)
-    * */
-    formRoutesFromPosts() {
-        return this.props.posts.map((post, index) => (
-            <Route
-                key={post.id}
-                exact={true}
-                path={post.path}
-                render={(routeProps) => (
-                    <Post {...routeProps} post={post}/>
-                )}
-            />));
-
-    }
 
     formLinksFromCategories() {
-        let categoryLinks:any = [];
+        let categoryLinks: any = [];
         categoryLinks.push(
             <NavLink
                 to={`/`}
                 exact={true}
-                key="all"
+                key={'all'}
                 activeStyle={{
                     fontWeight: 'bold',
                     color: 'red'
@@ -86,8 +67,8 @@ class App extends Component<IProps, IState> {
         this.state.categories.forEach((category, index) => (
             categoryLinks.push(
                 <NavLink
-                    to={`/${category.name}`}
-                    key={index}
+                    to={`/${category.name}/posts`}
+                    key={category.name}
                     activeStyle={{
                         fontWeight: 'bold',
                         color: 'red'
@@ -99,65 +80,30 @@ class App extends Component<IProps, IState> {
         return categoryLinks;
     }
 
+    renderCategoryLinks() {
+        return this.props.posts.map((post, index) => (
+            <div key={index}>
+                <Link
+                    to={`${post.category}/posts/${post.id}`}
+                >
+                    {post.title}
+                </Link>
+                <div>{`submitted ${moment(post.timestamp).fromNow()} to ${post.category}`}</div>
+                <div>{`${post.commentCount} comments`}</div>
+            </div>
+        ));
+    }
+
     render() {
         return (
             <div>
-                {this.formLinksFromCategories()}
-                <div>
-                    <Switch>
-                        {/*these routes are for the individual post*/}
-                        {this.formRoutesFromPosts()}
-
-                        {/*this route is rendered on the default page load "/". It will list the posts*/}
-                        <Route
-                            path={`/submit`}
-                            exact={true}
-                            component={AddNewPost}
-                        />
-                        <Route
-                            path={'/'}
-                            exact={false}
-                            render={(routeProps) => (
-                                <PostList {...routeProps}/>
-                            )}
-                        />
-                    </Switch>
-                </div>
+                <div>{this.formLinksFromCategories()}</div>
+                <Link to={`/new`}>
+                    Submit new post
+                </Link>
+                <div>{this.renderCategoryLinks()}</div>
             </div>
         );
-    }
-
-    renderCategoryLinks() {
-        let categoryLinks: any = [];
-        if (this.state.categories.length > 0) {
-            categoryLinks.push(
-                <NavLink
-                    to={`${this.props.match.path}`}
-                    exact={true}
-                    key="all"
-                    activeStyle={{
-                        fontWeight: 'bold',
-                        color: 'red'
-                    }}
-                >All
-                </NavLink>
-            );
-
-            this.state.categories.forEach((category, index) => (
-                categoryLinks.push(
-                    <NavLink
-                        to={`${this.props.match.path}${category.name}`}
-                        key={index}
-                        activeStyle={{
-                            fontWeight: 'bold',
-                            color: 'red'
-                        }}
-                    >{category.name}
-                    </NavLink>
-                )
-            ));
-        }
-        return categoryLinks;
     }
 }
 

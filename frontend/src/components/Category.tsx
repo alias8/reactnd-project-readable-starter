@@ -1,27 +1,33 @@
 import { Link } from 'react-router-dom';
 import * as React from 'react';
 import { Component } from 'react';
-import { IModifiedPost } from './App';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { connect, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/top';
 import * as moment from 'moment';
+import { IPost } from '../types/types';
+import * as API from '../api/api';
 
 interface IState {
+    posts: IPost[];
     sortMethod: string;
 }
 
 interface IMappedProps {
-    posts: IModifiedPost[];
+
 }
 
 interface IOwnProps {
 
 }
 
-type IProps = IOwnProps & IMappedProps & RouteComponentProps<{}>;
+interface ICategoryPageUrl {
+    category: string;
+}
 
-class PostList extends Component<IProps, IState> {
+type IProps = IOwnProps & IMappedProps & RouteComponentProps<ICategoryPageUrl>;
+
+class Category extends Component<IProps, IState> {
     VOTE_SCORE: string;
     TIME_STAMP: string;
 
@@ -30,8 +36,18 @@ class PostList extends Component<IProps, IState> {
         this.VOTE_SCORE = 'VOTE_SCORE';
         this.TIME_STAMP = 'TIME_STAMP';
         this.state = {
+            posts: [],
             sortMethod: this.VOTE_SCORE
         };
+    }
+
+    componentDidMount() {
+        API.getPostsForOneCategory(this.props.match.params.category)
+            .then(result => {
+                this.setState({
+                    posts: result
+                });
+            });
     }
 
     handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -44,7 +60,10 @@ class PostList extends Component<IProps, IState> {
         return (
             <div>
                 <h2>Posts</h2>
-                {this.props.posts &&
+                <Link to={`/new`}>
+                    Submit new post
+                </Link>
+                {this.state.posts &&
                 <div>
                     <div className="list-of-posts">
                         <div>sort by:</div>
@@ -53,30 +72,24 @@ class PostList extends Component<IProps, IState> {
                             <option value={this.TIME_STAMP}>Time (newest first)</option>
                         </select>
                         <ul>
-                            {this.props.posts
-                                .filter(post => (this.props.location.pathname === '/' ?
-                                    true : post.path.match(/(\/.+)\//)[1] === this.props.location.pathname))
+                            {this.state.posts
                                 .sort((a, b) => this.state.sortMethod === this.VOTE_SCORE ? b.voteScore - a.voteScore : a.timestamp - b.timestamp)
                                 .map((post, index) => {
                                     return (
-                                        <li key={post.id}>
-                                            <Link to={post.path}>
+                                        <div key={index}>
+                                            <Link
+                                                to={`/${post.category}/posts/${post.id}`}
+                                                key={index}
+                                            >
                                                 {post.title}
                                             </Link>
-                                            <div>submitted {moment(post.timestamp).fromNow()} by {post.author} to {post.category}</div>
-                                            <div>{post.voteScore} upvotes</div>
-                                            <div>{post.commentCount} comments</div>
-                                        </li>
+                                            <div>{`submitted ${moment(post.timestamp).fromNow()} to ${post.category}`}</div>
+                                            <div>{`${post.commentCount} comments`}</div>
+                                        </div>
                                     );
                                 })}
                         </ul>
                     </div>
-                    <Link
-                        to={`${this.props.match.path}submit`}
-                        className="list-of-posts submit-post-button"
-                    >
-                        Submit post
-                    </Link>
                 </div>
                 }
             </div>
@@ -85,7 +98,7 @@ class PostList extends Component<IProps, IState> {
 }
 
 const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
-    posts: state.posts.posts
+
 });
 
-export default withRouter<any>(connect(mapStateToProps)(PostList));
+export default withRouter<any>(connect(mapStateToProps)(Category));

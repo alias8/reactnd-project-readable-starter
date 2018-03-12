@@ -24,7 +24,7 @@ interface IOwnProps {
 
 type IProps = IOwnProps & IMappedProps & RouteComponentProps<{}>;
 
-export class AddNewPost extends React.Component<IProps, IState> {
+export class NewPost extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -38,13 +38,12 @@ export class AddNewPost extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
-        const categories =
-            API.fetchCategories()
-                .then(result => {
-                    this.setState({
-                        categories: result
-                    });
+        API.fetchCategories()
+            .then(result => {
+                this.setState({
+                    categories: result
                 });
+            });
     }
 
     handleSubmit = (event) => {
@@ -92,7 +91,7 @@ export class AddNewPost extends React.Component<IProps, IState> {
                         key={category.name}
                     >{category.name}
                     </button>
-                    );
+                );
             });
 
         if (this.state.postSubmitted) {
