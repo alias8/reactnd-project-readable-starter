@@ -145,6 +145,21 @@ export function getDetailsForOnePost(id: string): Promise<IPost> {
 // PARAMS:
 //     title - String
 // body - String
+
+export function editDetailsOfExistingPost(id: string, title: string, body: string): Promise<IPost> {
+    return fetch(`${api}/posts/${id}`, {
+        method: 'PUT',
+        headers: header,
+        body: JSON.stringify({
+            title,
+            body,
+        })
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
+}
+
 //
 // DELETE /posts/:id
 // USAGE:

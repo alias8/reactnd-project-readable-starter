@@ -11,6 +11,7 @@ interface IState {
     comments: IComment[];
     comment: string;
     author: string;
+    editEnabled: boolean;
     postDetails: IPost;
 }
 
@@ -36,6 +37,7 @@ export class PostPage extends React.Component<IProps, IState> {
             comments: [],
             comment: '',
             author: '',
+            editEnabled: false,
             postDetails: {
                 author: '',
                 body: '',
@@ -92,6 +94,42 @@ export class PostPage extends React.Component<IProps, IState> {
         });
     }
 
+    handleOriginalTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        this.setState(previousState => ({
+            postDetails: {
+                ...previousState.postDetails,
+                title: event.currentTarget.value
+            }
+        }));
+    }
+
+    handleOriginalBodyChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        this.setState(previousState => ({
+            postDetails: {
+                ...previousState.postDetails,
+                body: event.currentTarget.value
+            }
+        }));
+    }
+
+    onEditButtonClicked = () => {
+        if(this.state.editEnabled) {
+            API.editDetailsOfExistingPost(this.props.match.params.id, this.state.postDetails.title, this.state.postDetails.body)
+                .then((result) => {
+                    const a = 2;
+                })
+                .then((result) => {
+                    this.setState(previousState => ({
+                        editEnabled: !previousState.editEnabled
+                    }));
+                })
+        } else {
+            this.setState(previousState => ({
+                editEnabled: !previousState.editEnabled
+            }));
+        }
+    };
+
     render() {
         let comments = this.state.comments.map((comment, index) => (
                 <div key={index} className="comment">
@@ -105,28 +143,55 @@ export class PostPage extends React.Component<IProps, IState> {
 
         let fakeBody = [];
         for (let i = 0; i < 10; i++) {
-            fakeBody.push(<div>{this.state.postDetails.body}</div>);
+            fakeBody.push(<div key={i}>{this.state.postDetails.body}</div>);
         }
 
         return (
             <div>
+                {!this.state.editEnabled &&
+                    <div className="upper">
+                        <div className="post-vote-score">{this.state.postDetails.voteScore}</div>
+                        <div className="not-post-vote-score">
+                            <div className="post-title">{this.state.postDetails.title}</div>
+                            <div className="post-submitted-by">
+                                Submitted {moment(this.state.postDetails.timestamp).fromNow()} by {this.state.postDetails.author}
+                            </div>
+                            <div className="post-body">
+                                {fakeBody}
+                            </div>
+                        </div>
+                        <div>
+                            <button onClick={this.onEditButtonClicked}>Edit this post</button>
+                        </div>
+                    </div>
+                }
+
+                {this.state.editEnabled &&
                 <div className="upper">
                     <div className="post-vote-score">{this.state.postDetails.voteScore}</div>
                     <div className="not-post-vote-score">
-                        <div className="post-title">{this.state.postDetails.title}</div>
+                        <input
+                            name="title"
+                            value={this.state.postDetails.title}
+                            onChange={this.handleOriginalTitleChange}
+                        />
                         <div className="post-submitted-by">
                             Submitted {moment(this.state.postDetails.timestamp).fromNow()} by {this.state.postDetails.author}
                         </div>
                         <div className="post-body">
-                            {fakeBody}
+                            <textarea
+                                name="body"
+                                value={this.state.postDetails.body}
+                                onChange={this.handleOriginalBodyChange}
+                            />
                         </div>
                     </div>
                     <div>
-                        <Link to={`/${this.props.match.params.category}/posts/${this.props.match.params.id}/edit`}>
-                            Edit this post
-                        </Link>
+                        <button onClick={this.onEditButtonClicked}>Edit this post</button>
                     </div>
                 </div>
+                }
+
 
                 <div className="lower">
                     <div className="comment">COMMENT SECTION</div>
