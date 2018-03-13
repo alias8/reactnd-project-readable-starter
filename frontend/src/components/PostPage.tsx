@@ -41,7 +41,7 @@ export class PostPage extends React.Component<IProps, IState> {
             author: '',
             editParentEnabled: false,
             editChildEnabled: false,
-            editChildId: "",
+            editChildId: '',
             postDetails: {
                 author: '',
                 body: '',
@@ -88,7 +88,7 @@ export class PostPage extends React.Component<IProps, IState> {
 
     handleChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         switch (event.currentTarget.name) {
-            case "new_author":
+            case 'new_author':
                 this.setState({
                     author: event.currentTarget.value
                 });
@@ -138,9 +138,11 @@ export class PostPage extends React.Component<IProps, IState> {
                 editParentEnabled: true
             });
         }
-    };
+    }
 
     onEditChildCommentButtonClicked = (event: any) => {
+        event.preventDefault();
+        event.stopPropagation();
         if (this.state.editChildEnabled) {
             API.editDetailsOfExistingComment(event.currentTarget.name, this.state.postDetails.body)
                 .then((result) => {
@@ -152,19 +154,19 @@ export class PostPage extends React.Component<IProps, IState> {
         } else {
             this.setState({
                 editChildEnabled: true,
-                editChildId: event.currentTarget.value
+                editChildId: event.target.id
             });
         }
     }
 
     render() {
         let comments = this.state.comments.map((comment, index) => (
-                <form key={index} className="comment">
+                <form key={index} className="comment" onSubmit={this.onEditChildCommentButtonClicked} id={comment.id}>
                     <div>Author: {comment.author}</div>
-                    <input value={`Body: ${comment.body}`} readOnly={this.state.editChildId !== comment.id}/>
+                    <input value={`Body: ${comment.body}`} readOnly={this.state.editChildId !== comment.id} type="text" name="new_body"/>
                     <div>Timestamp: {moment(comment.timestamp).fromNow()}</div>
                     <div>VoteScore: {comment.voteScore}</div>
-                    <button onClick={this.onEditChildCommentButtonClicked} name={comment.id}>Edit this comment</button>
+                    <input type="submit" value={this.state.editChildId === comment.id ? 'Submit changes' : 'Edit this comment'}/>
                 </form>
             )
         );
