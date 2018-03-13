@@ -95,28 +95,30 @@ export class PostPage extends React.Component<IProps, IState> {
     }
 
     handleOriginalTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const newPostDetails = {
+            ...this.state.postDetails,
+            title: event.currentTarget.value
+        };
         this.setState(previousState => ({
-            postDetails: {
-                ...previousState.postDetails,
-                title: event.currentTarget.value
-            }
+            postDetails: newPostDetails
         }));
     }
 
     handleOriginalBodyChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        const newPostDetails = {
+            ...this.state.postDetails,
+            body: event.currentTarget.value
+        };
         this.setState(previousState => ({
-            postDetails: {
-                ...previousState.postDetails,
-                body: event.currentTarget.value
-            }
+            postDetails: newPostDetails
         }));
     }
 
     onEditButtonClicked = () => {
-        if(this.state.editEnabled) {
+        if (this.state.editEnabled) {
             API.editDetailsOfExistingPost(this.props.match.params.id, this.state.postDetails.title, this.state.postDetails.body)
-                .then((result) => {
-                    const a = 2;
+                .then(result => {
+                    const a = 2
                 })
                 .then((result) => {
                     this.setState(previousState => ({
@@ -149,21 +151,21 @@ export class PostPage extends React.Component<IProps, IState> {
         return (
             <div>
                 {!this.state.editEnabled &&
-                    <div className="upper">
-                        <div className="post-vote-score">{this.state.postDetails.voteScore}</div>
-                        <div className="not-post-vote-score">
-                            <div className="post-title">{this.state.postDetails.title}</div>
-                            <div className="post-submitted-by">
-                                Submitted {moment(this.state.postDetails.timestamp).fromNow()} by {this.state.postDetails.author}
-                            </div>
-                            <div className="post-body">
-                                {fakeBody}
-                            </div>
+                <div className="upper">
+                    <div className="post-vote-score">{this.state.postDetails.voteScore}</div>
+                    <div className="not-post-vote-score">
+                        <div className="post-title">{this.state.postDetails.title}</div>
+                        <div className="post-submitted-by">
+                            Submitted {moment(this.state.postDetails.timestamp).fromNow()} by {this.state.postDetails.author}
                         </div>
-                        <div>
-                            <button onClick={this.onEditButtonClicked}>Edit this post</button>
+                        <div className="post-body">
+                            {fakeBody}
                         </div>
                     </div>
+                    <div>
+                        <button onClick={this.onEditButtonClicked}>Edit this post</button>
+                    </div>
+                </div>
                 }
 
                 {this.state.editEnabled &&
