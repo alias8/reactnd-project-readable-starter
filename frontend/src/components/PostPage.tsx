@@ -11,8 +11,10 @@ interface IState {
     comments: IComment[];
     comment: string;
     author: string;
-    editEnabled: boolean;
+    editParentEnabled: boolean;
+    editChildEnabled: boolean;
     postDetails: IPost;
+    editChildId: string;
 }
 
 interface IMappedProps {
@@ -37,7 +39,9 @@ export class PostPage extends React.Component<IProps, IState> {
             comments: [],
             comment: '',
             author: '',
-            editEnabled: false,
+            editParentEnabled: false,
+            editChildEnabled: false,
+            editChildId: "",
             postDetails: {
                 author: '',
                 body: '',
@@ -68,12 +72,12 @@ export class PostPage extends React.Component<IProps, IState> {
     }
 
     handleSubmit = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         this.setState({
             comment: '',
             author: ''
-        })
-        event.preventDefault();
-        event.stopPropagation();
+        });
         API.postCommentToPost(this.state.author, this.state.comment, this.state.postDetails.id)
             .then((result: IComment) => {
                 this.setState(prevState => ({
@@ -82,64 +86,86 @@ export class PostPage extends React.Component<IProps, IState> {
             });
     }
 
-    handleCommentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        this.setState({
-            comment: event.currentTarget.value
-        });
+    handleChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
+        switch (event.currentTarget.name) {
+            case "new_author":
+                this.setState({
+                    author: event.currentTarget.value
+                });
+                break;
+            case "new_comment":
+                this.setState({
+                    comment: event.currentTarget.value
+                });
+                break;
+            case "original_title":
+                this.setState(previousState => {
+                    const newPostDetails = {
+                        ...previousState.postDetails,
+                        title: event.currentTarget.value
+                    };
+                    return {
+                        postDetails: newPostDetails
+                    }
+                });
+                break;
+            case "original_comment":
+                this.setState(previousState => {
+                    const newPostDetails = {
+                        ...previousState.postDetails,
+                        body: event.currentTarget.value
+                    };
+                    return {
+                        postDetails: newPostDetails
+                    }
+                });
+                break;
+            default:
+                break;
+        }
     }
 
-    handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-        this.setState({
-            author: event.currentTarget.value
-        });
-    }
-
-    handleOriginalTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const newPostDetails = {
-            ...this.state.postDetails,
-            title: event.currentTarget.value
-        };
-        this.setState(previousState => ({
-            postDetails: newPostDetails
-        }));
-    }
-
-    handleOriginalBodyChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        const newPostDetails = {
-            ...this.state.postDetails,
-            body: event.currentTarget.value
-        };
-        this.setState(previousState => ({
-            postDetails: newPostDetails
-        }));
-    }
-
-    onEditButtonClicked = () => {
-        if (this.state.editEnabled) {
+    onEditTopCommentButtonClicked = () => {
+        if (this.state.editParentEnabled) {
             API.editDetailsOfExistingPost(this.props.match.params.id, this.state.postDetails.title, this.state.postDetails.body)
-                .then(result => {
-                    const a = 2
-                })
                 .then((result) => {
-                    this.setState(previousState => ({
-                        editEnabled: !previousState.editEnabled
-                    }));
+                    this.setState({
+                        editParentEnabled: false
+                    });
                 })
         } else {
-            this.setState(previousState => ({
-                editEnabled: !previousState.editEnabled
-            }));
+            this.setState({
+                editParentEnabled: true
+            });
         }
     };
 
+    onEditChildCommentButtonClicked = (event: any) => {
+        if (this.state.editChildEnabled) {
+            API.editDetailsOfExistingComment(event.currentTarget.name, this.state.postDetails.body)
+                .then((result) => {
+                    this.setState({
+                        editChildEnabled: false,
+                        editChildId: ''
+                    });
+                })
+        } else {
+            this.setState({
+                editChildEnabled: true,
+                editChildId: event.currentTarget.value
+            });
+        }
+    }
+
     render() {
         let comments = this.state.comments.map((comment, index) => (
-                <div key={index} className="comment">
+                <form key={index} className="comment">
                     <div>Author: {comment.author}</div>
-                    <div>Body: {comment.body}</div>
+                    <input value={`Body: ${comment.body}`} readOnly={this.state.editChildId !== comment.id}/>
                     <div>Timestamp: {moment(comment.timestamp).fromNow()}</div>
                     <div>VoteScore: {comment.voteScore}</div>
-                </div>
+                    <button onClick={this.onEditChildCommentButtonClicked} name={comment.id}>Edit this comment</button>
+                </form>
             )
         );
 
@@ -150,7 +176,7 @@ export class PostPage extends React.Component<IProps, IState> {
 
         return (
             <div>
-                {!this.state.editEnabled &&
+                {!this.state.editParentEnabled &&
                 <div className="upper">
                     <div className="post-vote-score">{this.state.postDetails.voteScore}</div>
                     <div className="not-post-vote-score">
@@ -163,37 +189,36 @@ export class PostPage extends React.Component<IProps, IState> {
                         </div>
                     </div>
                     <div>
-                        <button onClick={this.onEditButtonClicked}>Edit this post</button>
+                        <button onClick={this.onEditTopCommentButtonClicked}>Edit this post</button>
                     </div>
                 </div>
                 }
 
-                {this.state.editEnabled &&
+                {this.state.editParentEnabled &&
                 <div className="upper">
                     <div className="post-vote-score">{this.state.postDetails.voteScore}</div>
                     <div className="not-post-vote-score">
                         <input
-                            name="title"
+                            name="original_title"
                             value={this.state.postDetails.title}
-                            onChange={this.handleOriginalTitleChange}
+                            onChange={this.handleChange}
                         />
                         <div className="post-submitted-by">
                             Submitted {moment(this.state.postDetails.timestamp).fromNow()} by {this.state.postDetails.author}
                         </div>
                         <div className="post-body">
                             <textarea
-                                name="body"
+                                name="original_comment"
                                 value={this.state.postDetails.body}
-                                onChange={this.handleOriginalBodyChange}
+                                onChange={this.handleChange}
                             />
                         </div>
                     </div>
                     <div>
-                        <button onClick={this.onEditButtonClicked}>Edit this post</button>
+                        <button onClick={this.onEditTopCommentButtonClicked}>Edit this post</button>
                     </div>
                 </div>
                 }
-
 
                 <div className="lower">
                     <div className="comment">COMMENT SECTION</div>
@@ -201,19 +226,19 @@ export class PostPage extends React.Component<IProps, IState> {
                         <label>
                             Your comment:
                             <textarea
-                                name="comment"
+                                name="new_comment"
                                 className="input-box"
                                 value={this.state.comment}
-                                onChange={this.handleCommentChange}
+                                onChange={this.handleChange}
                             />
                         </label>
                         <label>
                             Your name:
                             <input
                                 type="text"
-                                name="name"
+                                name="new_author"
                                 value={this.state.author}
-                                onChange={this.handleNameChange}
+                                onChange={this.handleChange}
                             />
                         </label>
                         <input type="submit" value="Submit"/>

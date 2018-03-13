@@ -22,7 +22,6 @@ ReactDOM.render(
         <Router>
             <Switch>
                 <Route exact={true} path={'/new'} component={NewPost}/>
-                {/*<Route exact={true} path={'/:category/posts/:id/new_comment'} component={NewComment}/>*/}
                 <Route exact={true} path={'/'} component={App}/>
                 <Route exact={true} path={'/404'} component={NotFoundPage}/>
                 <Route exact={true} path={'/:category/posts'} component={Category}/>

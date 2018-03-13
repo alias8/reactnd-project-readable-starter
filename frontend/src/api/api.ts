@@ -139,13 +139,13 @@ export function getDetailsForOnePost(id: string): Promise<IPost> {
 // PARAMS:
 //     option - String: Either "upVote" or "downVote"
 //
+
+
+
+
 // PUT /posts/:id
 // USAGE:
 //     Edit the details of an existing post
-// PARAMS:
-//     title - String
-// body - String
-
 export function editDetailsOfExistingPost(id: string, title: string, body: string): Promise<IPost> {
     return fetch(`${api}/posts/${id}`, {
         method: 'PUT',
@@ -178,10 +178,30 @@ export function editDetailsOfExistingPost(id: string, title: string, body: strin
 // USAGE:
 //     Used for voting on a comment.
 //
+
+
+
+
+
 //     PUT /comments/:id
 // USAGE:
 //     Edit the details of an existing comment
-//
+export function editDetailsOfExistingComment(id: string, body: string): Promise<IPost> {
+    return fetch(`${api}/comments/${id}`, {
+        method: 'PUT',
+        headers: header,
+        body: JSON.stringify({
+            timestamp: moment().unix() * 1000,
+            body,
+        })
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
+}
+
+
+
 // PARAMS:
 //     timestamp: timestamp. Get this however you want.
 //     body: String
