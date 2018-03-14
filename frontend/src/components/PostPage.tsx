@@ -98,12 +98,12 @@ export class PostPage extends React.Component<IProps, IState> {
                     childNewAuthor: target.value
                 });
                 break;
-            case "child_new_comment":
+            case 'child_new_comment':
                 this.setState({
                     childNewComment: target.value
                 });
                 break;
-            case "parent_title":
+            case 'parent_title':
                 this.setState(previousState => {
                     const newPostDetails = {
                         ...previousState.parentPostDetails,
@@ -111,10 +111,10 @@ export class PostPage extends React.Component<IProps, IState> {
                     };
                     return {
                         parentPostDetails: newPostDetails
-                    }
+                    };
                 });
                 break;
-            case "parent_comment":
+            case 'parent_comment':
                 this.setState(previousState => {
                     const newPostDetails = {
                         ...previousState.parentPostDetails,
@@ -122,10 +122,10 @@ export class PostPage extends React.Component<IProps, IState> {
                     };
                     return {
                         parentPostDetails: newPostDetails
-                    }
+                    };
                 });
                 break;
-            case "editChildBody":
+            case 'editChildBody':
                 this.setState({
                     editChildBody: target.value
                 });
@@ -144,7 +144,13 @@ export class PostPage extends React.Component<IProps, IState> {
                     this.setState({
                         editParentEnabled: false
                     });
+                    return API.getDetailsForOnePost(this.props.match.params.id)
                 })
+                .then(result => {
+                    this.setState({
+                        parentPostDetails: result
+                    });
+                });
         } else {
             this.setState({
                 editParentEnabled: true
@@ -164,7 +170,7 @@ export class PostPage extends React.Component<IProps, IState> {
                         editChildId: '',
                         editChildBody: ''
                     });
-                    return API.getCommentsForPost(this.props.match.params.id)
+                    return API.getCommentsForPost(this.props.match.params.id);
                 })
                 .then(result => {
                     this.setState({
@@ -187,8 +193,8 @@ export class PostPage extends React.Component<IProps, IState> {
             .then(result => {
                 this.setState({
                     parentPostDeleted: true
-                })
-            })
+                });
+            });
     }
 
     onDeleteChildCommentClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -197,7 +203,7 @@ export class PostPage extends React.Component<IProps, IState> {
         const target = event.target as HTMLButtonElement;
         API.deleteComment(target.id)
             .then(result => {
-                return API.getCommentsForPost(this.props.match.params.id)
+                return API.getCommentsForPost(this.props.match.params.id);
             })
             .then(result => {
                 this.setState({
@@ -212,7 +218,7 @@ export class PostPage extends React.Component<IProps, IState> {
         const target = event.target as HTMLButtonElement;
         API.voteOnComment(target.id, target.name)
             .then(result => {
-                return API.getCommentsForPost(this.props.match.params.id)
+                return API.getCommentsForPost(this.props.match.params.id);
             })
             .then(result => {
                 this.setState({
@@ -221,11 +227,26 @@ export class PostPage extends React.Component<IProps, IState> {
             });
     }
 
+    voteOnPost = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const target = event.target as HTMLButtonElement;
+        API.voteOnPost(target.id, target.name)
+            .then(result => {
+                return API.getDetailsForOnePost(this.props.match.params.id)
+            })
+            .then(result => {
+                this.setState({
+                    parentPostDetails: result
+                });
+            });
+    }
+
     render() {
         if (this.state.parentPostDeleted) {
             return (
-                <Redirect to={"/"}/>
-            )
+                <Redirect to={'/'}/>
+            );
         }
 
         let comments = this.state.comments.map((comment, index) => {
@@ -249,7 +270,7 @@ export class PostPage extends React.Component<IProps, IState> {
                         <button name="upVote" id={comment.id} onClick={this.voteOnComment}>upvote</button>
                         <button name="downVote" id={comment.id} onClick={this.voteOnComment}>downvote</button>
                     </form>
-                )
+                );
             }
         );
 
@@ -257,34 +278,9 @@ export class PostPage extends React.Component<IProps, IState> {
         for (let i = 0; i < 10; i++) {
             fakeBody.push(<div key={i}>{this.state.parentPostDetails.body}</div>);
         }
-
-        return ( // todo: combined the two upper JSX parts into one
-            x =
+        const parentBeingEdited = this.state.editParentEnabled;
+        return (
             <div>
-                {!this.state.editParentEnabled &&
-                <div className="upper">
-                    <div className="post-vote-score">{this.state.parentPostDetails.voteScore}</div>
-                    <div className="not-post-vote-score">
-                        <div className="post-title">{this.state.parentPostDetails.title}</div>
-                        <div className="post-submitted-by">
-                            Submitted {moment(this.state.parentPostDetails.timestamp).fromNow()} by {this.state.parentPostDetails.author}
-                        </div>
-                        <div className="post-body">
-                            {fakeBody}
-                        </div>
-                    </div>
-                    <div>
-                        {this.state.editParentEnabled ? (
-                            <button onClick={this.onEditTopCommentButtonClicked}>Submit changes</button>
-                        ) : (
-                            <button onClick={this.onEditTopCommentButtonClicked}>Edit this post</button>
-                        )}
-                        <button onClick={this.onDeleteTopCommentButtonClicked}>Delete this post</button>
-                    </div>
-                </div>
-                }
-
-                {this.state.editParentEnabled &&
                 <div className="upper">
                     <div className="post-vote-score">{this.state.parentPostDetails.voteScore}</div>
                     <div className="not-post-vote-score">
@@ -292,6 +288,7 @@ export class PostPage extends React.Component<IProps, IState> {
                             name="parent_title"
                             value={this.state.parentPostDetails.title}
                             onChange={this.handleChange}
+                            readOnly={!parentBeingEdited}
                         />
                         <div className="post-submitted-by">
                             Submitted {moment(this.state.parentPostDetails.timestamp).fromNow()} by {this.state.parentPostDetails.author}
@@ -301,14 +298,21 @@ export class PostPage extends React.Component<IProps, IState> {
                                 name="parent_comment"
                                 value={this.state.parentPostDetails.body}
                                 onChange={this.handleChange}
+                                readOnly={!parentBeingEdited}
                             />
                         </div>
                     </div>
                     <div>
-                        <button onClick={this.onEditTopCommentButtonClicked}>Edit this post</button>
+                        {this.state.editParentEnabled ? (
+                            <button onClick={this.onEditTopCommentButtonClicked}>Submit changes</button>
+                        ) : (
+                            <button onClick={this.onEditTopCommentButtonClicked}>Edit this post</button>
+                        )}
+                        <button onClick={this.onDeleteTopCommentButtonClicked}>Delete this post</button>
+                        <button name="upVote" id={this.props.match.params.id} onClick={this.voteOnPost}>upvote</button>
+                        <button name="downVote" id={this.props.match.params.id} onClick={this.voteOnPost}>downvote</button>
                     </div>
                 </div>
-                }
 
                 <div className="lower">
                     <div className="comment">COMMENT SECTION</div>

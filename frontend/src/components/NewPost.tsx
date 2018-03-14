@@ -96,7 +96,7 @@ export class NewPost extends React.Component<IProps, IState> {
 
         if (this.state.postSubmitted) {
             return (
-                <Redirect to={`/${this.state.chosenCategory}/${this.state.title.replace(/ /g, '_')}`}/>
+                <Redirect to={'/'}/>
             );
         } else {
             return (
@@ -121,7 +121,6 @@ export class NewPost extends React.Component<IProps, IState> {
                         <label className="add-new-post-input">
                             Author:
                             <input
-                                type="text"
                                 name="author"
                                 onChange={this.handleAuthorChange}
                             />

@@ -100,6 +100,19 @@ export function getDetailsForOnePost(id: string): Promise<IPost> {
 //     Used for voting on a post
 // PARAMS:
 //     option - String: Either "upVote" or "downVote"
+
+export function voteOnPost(id: string, vote: string): Promise<IPost> {
+    return fetch(`${api}/posts/${id}`, {
+        method: 'POST',
+        headers: header,
+        body: JSON.stringify({
+            option: vote,
+        })
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
+}
 //
 
 
