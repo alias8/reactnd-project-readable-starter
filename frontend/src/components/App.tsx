@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 
 import PostList from './Category';
 import * as API from '../api/api';
-import { getPosts } from '../actions/actions';
+import { deletePostAction, updateCategoriesAction, updatePostsAction, voteOnPostAction } from '../actions/actions';
 import { PostPage } from './PostPage';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
@@ -15,7 +15,6 @@ import { NewPost } from './NewPost';
 import * as moment from 'moment';
 
 interface IState {
-    categories: ICategory[];
     editPostClicked: boolean;
     editPostId: string;
     editPostCategory: string;
@@ -24,6 +23,7 @@ interface IState {
 
 interface IMappedProps {
     posts: IPost[];
+    categories: ICategory[]
 }
 
 interface IOwnProps {
@@ -40,7 +40,6 @@ class App extends Component<IProps, IState> {
         this.VOTE_SCORE = 'VOTE_SCORE';
         this.TIME_STAMP = 'TIME_STAMP';
         this.state = {
-            categories: [],
             editPostClicked: false,
             editPostId: '',
             editPostCategory: '',
@@ -51,13 +50,11 @@ class App extends Component<IProps, IState> {
     componentDidMount() {
         API.fetchPosts()
             .then(result => {
-                this.props.dispatch(getPosts(result));
+                this.props.dispatch(updatePostsAction(result));
             });
         API.fetchCategories()
             .then(result => {
-                this.setState({
-                    categories: result
-                });
+                this.props.dispatch(updateCategoriesAction(result));
             });
     }
 
@@ -76,7 +73,7 @@ class App extends Component<IProps, IState> {
             </NavLink>
         );
 
-        this.state.categories.forEach((category, index) => (
+        this.props.categories.forEach((category, index) => (
             categoryLinks.push(
                 <NavLink
                     to={`/${category.name}/posts`}
@@ -97,12 +94,9 @@ class App extends Component<IProps, IState> {
         event.stopPropagation();
         const target = event.target as HTMLButtonElement;
         API.deletePost(target.id)
-            .then(() => {
-                return API.fetchPosts();
+            .then((result) => {
+                this.props.dispatch(deletePostAction(result))
             })
-            .then(result => {
-                this.props.dispatch(getPosts(result));
-            });
     }
 
     voteOnPost = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -110,12 +104,9 @@ class App extends Component<IProps, IState> {
         event.stopPropagation();
         const target = event.target as HTMLButtonElement;
         API.voteOnPost(target.id, target.name)
-            .then(() => {
-                return API.fetchPosts();
+            .then((result) => {
+                this.props.dispatch(voteOnPostAction(result))
             })
-            .then(result => {
-                this.props.dispatch(getPosts(result));
-            });
     }
 
     onEditPostClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -137,7 +128,13 @@ class App extends Component<IProps, IState> {
 
     renderCategoryLinks() {
         return this.props.posts
-            .sort((a, b) => this.state.sortMethod === this.VOTE_SCORE ? b.voteScore - a.voteScore : a.timestamp - b.timestamp)
+            .sort((a, b) => {
+                if(this.state.sortMethod === this.VOTE_SCORE) {
+                    return b.voteScore - a.voteScore
+                } else {
+                    return b.timestamp - a.timestamp
+                }
+            })
             .map((post, index) => (
             <div key={index}>
                 <Link
@@ -180,7 +177,8 @@ class App extends Component<IProps, IState> {
 }
 
 const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
-    posts: state.posts.posts
+    posts: state.posts.posts,
+    categories: state.categories.categories
 });
 
 export default withRouter<any>(connect(mapStateToProps)(App));

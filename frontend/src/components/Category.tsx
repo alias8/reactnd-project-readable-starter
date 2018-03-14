@@ -9,12 +9,11 @@ import { IPost } from '../types/types';
 import * as API from '../api/api';
 
 interface IState {
-    posts: IPost[];
     sortMethod: string;
 }
 
 interface IMappedProps {
-
+    posts: IPost[];
 }
 
 interface IOwnProps {
@@ -30,24 +29,13 @@ type IProps = IOwnProps & IMappedProps & RouteComponentProps<ICategoryPageUrl>;
 class Category extends Component<IProps, IState> {
     VOTE_SCORE: string;
     TIME_STAMP: string;
-
     constructor(props: IProps) {
         super(props);
         this.VOTE_SCORE = 'VOTE_SCORE';
         this.TIME_STAMP = 'TIME_STAMP';
         this.state = {
-            posts: [],
             sortMethod: this.VOTE_SCORE
         };
-    }
-
-    componentDidMount() {
-        API.getPostsForOneCategory(this.props.match.params.category)
-            .then(result => {
-                this.setState({
-                    posts: result
-                });
-            });
     }
 
     handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -63,7 +51,7 @@ class Category extends Component<IProps, IState> {
                 <Link to={`/new`}>
                     Submit new post
                 </Link>
-                {this.state.posts &&
+                {this.props.posts &&
                 <div>
                     <div className="list-of-posts">
                         <div>sort by:</div>
@@ -72,8 +60,8 @@ class Category extends Component<IProps, IState> {
                             <option value={this.TIME_STAMP}>Time (newest first)</option>
                         </select>
                         <ul>
-                            {this.state.posts
-                                .sort((a, b) => this.state.sortMethod === this.VOTE_SCORE ? b.voteScore - a.voteScore : a.timestamp - b.timestamp)
+                            {this.props.posts
+                                .sort((a, b) => this.state.sortMethod === this.VOTE_SCORE ? b.voteScore - a.voteScore : b.timestamp - a.timestamp)
                                 .map((post, index) => {
                                     return (
                                         <div key={index}>
@@ -98,7 +86,9 @@ class Category extends Component<IProps, IState> {
 }
 
 const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
-
+    posts: state.posts.posts.filter(post => {
+        return post.category === props.match.params.category
+    })
 });
 
 export default withRouter<any>(connect(mapStateToProps)(Category));
