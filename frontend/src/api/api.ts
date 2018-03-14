@@ -9,10 +9,6 @@ const header = {
     'Content-Type': 'application/json',
 };
 
-//     GET /categories
-// USAGE:
-//     Get all of the categories available for the app. List is found in categories.js.
-//     Feel free to extend this list as you desire.
 export function fetchCategories(): Promise<ICategory[]> {
     return fetch(`${api}/categories`, {
         method: 'GET',
@@ -23,9 +19,6 @@ export function fetchCategories(): Promise<ICategory[]> {
         .catch(error => error);
 }
 
-// GET /posts
-// USAGE:
-//     Get all of the posts. Useful for the main page when no category is selected.
 export function fetchPosts(): Promise<IPost[]> {
     return fetch(`${api}/posts`, {
         method: 'GET',
@@ -36,9 +29,6 @@ export function fetchPosts(): Promise<IPost[]> {
         .catch(error => error);
 }
 
-//     GET /posts/:id/comments
-// USAGE:
-//     Get all the comments for a single post
 export function getCommentsForPost(id: string): Promise<IComment[]> {
     return fetch(`${api}/posts/${id}/comments`, {
         method: 'GET',
@@ -49,16 +39,6 @@ export function getCommentsForPost(id: string): Promise<IComment[]> {
         .catch(error => error);
 }
 
-// POST /comments
-// USAGE:
-//     Add a comment to a post
-//
-// PARAMS:
-//     id: Any unique ID. As with posts, UUID is probably the best here.
-//     timestamp: timestamp. Get this however you want.
-//     body: String
-// author: String
-// parentId: Should match a post id in the database.
 export function postCommentToPost(author: string, body: string, parentId: string): Promise<IComment> {
     return fetch(`${api}/comments`, {
         method: 'POST',
@@ -76,16 +56,6 @@ export function postCommentToPost(author: string, body: string, parentId: string
         .catch(error => error);
 }
 
-//     POST /posts
-// USAGE:
-//     Add a new post
-// PARAMS:
-//     id - UUID should be fine, but any unique id will work
-// timestamp - timestamp in whatever format you like, you can use Date.now() if you like
-// title - String
-// body - String
-// author - String
-// category: Any of the categories listed in categories.js. Feel free to extend this list as you desire.
 export function addNewPost(title: string, body: string, author: string, category: string): Promise<IComment> {
     return fetch(`${api}/posts`, {
         method: 'POST',
@@ -104,10 +74,6 @@ export function addNewPost(title: string, body: string, author: string, category
         .catch(error => error);
 }
 
-//
-//     GET /:category/posts
-// USAGE:
-//     Get all of the posts for a particular category
 export function getPostsForOneCategory(category: string): Promise<IPost[]> {
     return fetch(`${api}/${category}/posts`, {
         method: 'GET',
@@ -118,10 +84,6 @@ export function getPostsForOneCategory(category: string): Promise<IPost[]> {
         .catch(error => error);
 }
 
-//
-//     GET /posts/:id
-// USAGE:
-//     Get the details of a single post
 export function getDetailsForOnePost(id: string): Promise<IPost> {
     return fetch(`${api}/posts/${id}`, {
         method: 'GET',
@@ -141,11 +103,6 @@ export function getDetailsForOnePost(id: string): Promise<IPost> {
 //
 
 
-
-
-// PUT /posts/:id
-// USAGE:
-//     Edit the details of an existing post
 export function editDetailsOfExistingPost(id: string, title: string, body: string): Promise<IPost> {
     return fetch(`${api}/posts/${id}`, {
         method: 'PUT',
@@ -160,12 +117,15 @@ export function editDetailsOfExistingPost(id: string, title: string, body: strin
         .catch(error => error);
 }
 
-//
-// DELETE /posts/:id
-// USAGE:
-//     Sets the deleted flag for a post to 'true'.
-//     Sets the parentDeleted flag for all child comments to 'true'.
-//
+export function deletePost(id: string): Promise<IPost> {
+    return fetch(`${api}/posts/${id}`, {
+        method: 'DELETE',
+        headers: header,
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
+}
 
 //
 
@@ -174,18 +134,22 @@ export function editDetailsOfExistingPost(id: string, title: string, body: strin
 // USAGE:
 //     Get the details for a single comment
 //
-// POST /comments/:id
-// USAGE:
-//     Used for voting on a comment.
-//
 
 
+export function voteOnComment(id: string, vote: string): Promise<IPost> {
+    return fetch(`${api}/comments/${id}`, {
+        method: 'POST',
+        headers: header,
+        body: JSON.stringify({
+            option: vote,
+        })
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
+}
 
 
-
-//     PUT /comments/:id
-// USAGE:
-//     Edit the details of an existing comment
 export function editDetailsOfExistingComment(id: string, body: string): Promise<IPost> {
     return fetch(`${api}/comments/${id}`, {
         method: 'PUT',
@@ -200,12 +164,12 @@ export function editDetailsOfExistingComment(id: string, body: string): Promise<
         .catch(error => error);
 }
 
-
-
-// PARAMS:
-//     timestamp: timestamp. Get this however you want.
-//     body: String
-//
-// DELETE /comments/:id
-// USAGE:
-//     Sets a comment's deleted flag to 'true'
+export function deleteComment(id: string): Promise<IPost> {
+    return fetch(`${api}/comments/${id}`, {
+        method: 'DELETE',
+        headers: header,
+    })
+        .then(result => result.json())
+        .then(data => data)
+        .catch(error => error);
+}

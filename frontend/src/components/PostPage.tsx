@@ -1,20 +1,22 @@
 import * as React from 'react';
 import * as API from '../api/api';
 import '../styles/App.css';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, FormEvent } from 'react';
 import { IComment, IPost } from '../types/types';
 import * as moment from 'moment';
-import { RouteComponentProps } from 'react-router';
+import { Redirect, RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 
 interface IState {
     comments: IComment[];
-    comment: string;
-    author: string;
+    childNewComment: string;
+    childNewAuthor: string;
     editParentEnabled: boolean;
     editChildEnabled: boolean;
-    postDetails: IPost;
+    parentPostDetails: IPost;
     editChildId: string;
+    editChildBody: string;
+    parentPostDeleted: boolean;
 }
 
 interface IMappedProps {
@@ -37,12 +39,14 @@ export class PostPage extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             comments: [],
-            comment: '',
-            author: '',
+            childNewComment: '',
+            childNewAuthor: '',
             editParentEnabled: false,
             editChildEnabled: false,
             editChildId: '',
-            postDetails: {
+            editChildBody: '',
+            parentPostDeleted: false,
+            parentPostDetails: {
                 author: '',
                 body: '',
                 category: '',
@@ -66,7 +70,7 @@ export class PostPage extends React.Component<IProps, IState> {
         API.getDetailsForOnePost(this.props.match.params.id)
             .then(result => {
                 this.setState({
-                    postDetails: result
+                    parentPostDetails: result
                 });
             });
     }
@@ -74,50 +78,56 @@ export class PostPage extends React.Component<IProps, IState> {
     handleSubmit = (event) => {
         event.preventDefault();
         event.stopPropagation();
-        this.setState({
-            comment: '',
-            author: ''
-        });
-        API.postCommentToPost(this.state.author, this.state.comment, this.state.postDetails.id)
+        API.postCommentToPost(this.state.childNewAuthor, this.state.childNewComment, this.props.match.params.id)
             .then((result: IComment) => {
                 this.setState(prevState => ({
-                    comments: [...prevState.comments, result]
+                    comments: [...prevState.comments, result],
+                    childNewComment: '',
+                    childNewAuthor: ''
                 }));
             });
     }
 
     handleChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
-        switch (event.currentTarget.name) {
-            case 'new_author':
+        event.preventDefault();
+        event.stopPropagation();
+        const target = event.target as HTMLInputElement;
+        switch (target.name) {
+            case 'child_new_author':
                 this.setState({
-                    author: event.currentTarget.value
+                    childNewAuthor: target.value
                 });
                 break;
-            case "new_comment":
+            case "child_new_comment":
                 this.setState({
-                    comment: event.currentTarget.value
+                    childNewComment: target.value
                 });
                 break;
-            case "original_title":
+            case "parent_title":
                 this.setState(previousState => {
                     const newPostDetails = {
-                        ...previousState.postDetails,
-                        title: event.currentTarget.value
+                        ...previousState.parentPostDetails,
+                        title: target.value
                     };
                     return {
-                        postDetails: newPostDetails
+                        parentPostDetails: newPostDetails
                     }
                 });
                 break;
-            case "original_comment":
+            case "parent_comment":
                 this.setState(previousState => {
                     const newPostDetails = {
-                        ...previousState.postDetails,
-                        body: event.currentTarget.value
+                        ...previousState.parentPostDetails,
+                        body: target.value
                     };
                     return {
-                        postDetails: newPostDetails
+                        parentPostDetails: newPostDetails
                     }
+                });
+                break;
+            case "editChildBody":
+                this.setState({
+                    editChildBody: target.value
                 });
                 break;
             default:
@@ -125,9 +135,11 @@ export class PostPage extends React.Component<IProps, IState> {
         }
     }
 
-    onEditTopCommentButtonClicked = () => {
+    onEditTopCommentButtonClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
         if (this.state.editParentEnabled) {
-            API.editDetailsOfExistingPost(this.props.match.params.id, this.state.postDetails.title, this.state.postDetails.body)
+            API.editDetailsOfExistingPost(this.props.match.params.id, this.state.parentPostDetails.title, this.state.parentPostDetails.body)
                 .then((result) => {
                     this.setState({
                         editParentEnabled: false
@@ -140,78 +152,154 @@ export class PostPage extends React.Component<IProps, IState> {
         }
     }
 
-    onEditChildCommentButtonClicked = (event: any) => {
+    onEditChildCommentButtonClicked = (event: FormEvent<EventTarget>) => {
         event.preventDefault();
         event.stopPropagation();
+        const target = event.target as HTMLInputElement;
         if (this.state.editChildEnabled) {
-            API.editDetailsOfExistingComment(event.currentTarget.name, this.state.postDetails.body)
-                .then((result) => {
+            API.editDetailsOfExistingComment(target.id, this.state.editChildBody)
+                .then(() => {
                     this.setState({
                         editChildEnabled: false,
-                        editChildId: ''
+                        editChildId: '',
+                        editChildBody: ''
                     });
+                    return API.getCommentsForPost(this.props.match.params.id)
                 })
+                .then(result => {
+                    this.setState({
+                        comments: result
+                    });
+                });
         } else {
             this.setState({
                 editChildEnabled: true,
-                editChildId: event.target.id
+                editChildId: target.id,
+                editChildBody: target[0].defaultValue
             });
         }
     }
 
+    onDeleteTopCommentButtonClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        API.deletePost(this.props.match.params.id)
+            .then(result => {
+                this.setState({
+                    parentPostDeleted: true
+                })
+            })
+    }
+
+    onDeleteChildCommentClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const target = event.target as HTMLButtonElement;
+        API.deleteComment(target.id)
+            .then(result => {
+                return API.getCommentsForPost(this.props.match.params.id)
+            })
+            .then(result => {
+                this.setState({
+                    comments: result
+                });
+            });
+    }
+
+    voteOnComment = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const target = event.target as HTMLButtonElement;
+        API.voteOnComment(target.id, target.name)
+            .then(result => {
+                return API.getCommentsForPost(this.props.match.params.id)
+            })
+            .then(result => {
+                this.setState({
+                    comments: result
+                });
+            });
+    }
+
     render() {
-        let comments = this.state.comments.map((comment, index) => (
-                <form key={index} className="comment" onSubmit={this.onEditChildCommentButtonClicked} id={comment.id}>
-                    <div>Author: {comment.author}</div>
-                    <input value={`Body: ${comment.body}`} readOnly={this.state.editChildId !== comment.id} type="text" name="new_body"/>
-                    <div>Timestamp: {moment(comment.timestamp).fromNow()}</div>
-                    <div>VoteScore: {comment.voteScore}</div>
-                    <input type="submit" value={this.state.editChildId === comment.id ? 'Submit changes' : 'Edit this comment'}/>
-                </form>
+        if (this.state.parentPostDeleted) {
+            return (
+                <Redirect to={"/"}/>
             )
+        }
+
+        let comments = this.state.comments.map((comment, index) => {
+                const commentBeingEdited = this.state.editChildId === comment.id;
+                return (
+                    <form key={index} className="comment" onSubmit={this.onEditChildCommentButtonClicked} id={comment.id}>
+                        <div>Author: {comment.author}</div>
+                        {commentBeingEdited ? (
+                            <input value={this.state.editChildBody} readOnly={false} type="text" name="editChildBody" onChange={this.handleChange}/>
+                        ) : (
+                            <input value={comment.body} readOnly={true} type="text"/>
+                        )}
+                        <div>Timestamp: {moment(comment.timestamp).fromNow()}</div>
+                        <div>VoteScore: {comment.voteScore}</div>
+                        {commentBeingEdited ? (
+                            <button type="submit">Submit changes</button>
+                        ) : (
+                            <button type="submit">Edit this comment</button>
+                        )}
+                        <button type="submit" id={comment.id} onClick={this.onDeleteChildCommentClicked}>Delete this comment</button>
+                        <button name="upVote" id={comment.id} onClick={this.voteOnComment}>upvote</button>
+                        <button name="downVote" id={comment.id} onClick={this.voteOnComment}>downvote</button>
+                    </form>
+                )
+            }
         );
 
         let fakeBody = [];
         for (let i = 0; i < 10; i++) {
-            fakeBody.push(<div key={i}>{this.state.postDetails.body}</div>);
+            fakeBody.push(<div key={i}>{this.state.parentPostDetails.body}</div>);
         }
 
-        return (
+        return ( // todo: combined the two upper JSX parts into one
+            x =
             <div>
                 {!this.state.editParentEnabled &&
                 <div className="upper">
-                    <div className="post-vote-score">{this.state.postDetails.voteScore}</div>
+                    <div className="post-vote-score">{this.state.parentPostDetails.voteScore}</div>
                     <div className="not-post-vote-score">
-                        <div className="post-title">{this.state.postDetails.title}</div>
+                        <div className="post-title">{this.state.parentPostDetails.title}</div>
                         <div className="post-submitted-by">
-                            Submitted {moment(this.state.postDetails.timestamp).fromNow()} by {this.state.postDetails.author}
+                            Submitted {moment(this.state.parentPostDetails.timestamp).fromNow()} by {this.state.parentPostDetails.author}
                         </div>
                         <div className="post-body">
                             {fakeBody}
                         </div>
                     </div>
                     <div>
-                        <button onClick={this.onEditTopCommentButtonClicked}>Edit this post</button>
+                        {this.state.editParentEnabled ? (
+                            <button onClick={this.onEditTopCommentButtonClicked}>Submit changes</button>
+                        ) : (
+                            <button onClick={this.onEditTopCommentButtonClicked}>Edit this post</button>
+                        )}
+                        <button onClick={this.onDeleteTopCommentButtonClicked}>Delete this post</button>
                     </div>
                 </div>
                 }
 
                 {this.state.editParentEnabled &&
                 <div className="upper">
-                    <div className="post-vote-score">{this.state.postDetails.voteScore}</div>
+                    <div className="post-vote-score">{this.state.parentPostDetails.voteScore}</div>
                     <div className="not-post-vote-score">
                         <input
-                            name="original_title"
-                            value={this.state.postDetails.title}
+                            name="parent_title"
+                            value={this.state.parentPostDetails.title}
                             onChange={this.handleChange}
                         />
                         <div className="post-submitted-by">
-                            Submitted {moment(this.state.postDetails.timestamp).fromNow()} by {this.state.postDetails.author}
+                            Submitted {moment(this.state.parentPostDetails.timestamp).fromNow()} by {this.state.parentPostDetails.author}
                         </div>
                         <div className="post-body">
                             <textarea
-                                name="original_comment"
-                                value={this.state.postDetails.body}
+                                name="parent_comment"
+                                value={this.state.parentPostDetails.body}
                                 onChange={this.handleChange}
                             />
                         </div>
@@ -228,9 +316,9 @@ export class PostPage extends React.Component<IProps, IState> {
                         <label>
                             Your comment:
                             <textarea
-                                name="new_comment"
+                                name="child_new_comment"
                                 className="input-box"
-                                value={this.state.comment}
+                                value={this.state.childNewComment}
                                 onChange={this.handleChange}
                             />
                         </label>
@@ -238,8 +326,8 @@ export class PostPage extends React.Component<IProps, IState> {
                             Your name:
                             <input
                                 type="text"
-                                name="new_author"
-                                value={this.state.author}
+                                name="child_new_author"
+                                value={this.state.childNewAuthor}
                                 onChange={this.handleChange}
                             />
                         </label>
