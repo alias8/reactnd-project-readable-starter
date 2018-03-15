@@ -12,10 +12,10 @@ import {
 import { Switch } from 'react-router';
 import { NewPost } from './components/NewPost';
 import { NotFoundPage } from './components/NotFoundPage';
-import { PostPage } from './components/PostPage';
 import Category from './components/Category';
 import { EditComment } from './components/EditComment';
 import { NewComment } from './components/NewComment';
+import PostPage from "./components/PostPage";
 
 ReactDOM.render(
     <Provider store={store}>

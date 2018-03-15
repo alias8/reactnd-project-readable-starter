@@ -163,7 +163,7 @@ export function voteOnComment(id: string, vote: string): Promise<IPost> {
 }
 
 
-export function editDetailsOfExistingComment(id: string, body: string): Promise<IPost> {
+export function editDetailsOfExistingComment(id: string, body: string): Promise<IComment> {
     return fetch(`${api}/comments/${id}`, {
         method: 'PUT',
         headers: header,
