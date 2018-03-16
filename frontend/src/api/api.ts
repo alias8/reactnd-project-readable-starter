@@ -149,7 +149,7 @@ export function deletePost(id: string): Promise<IPost> {
 //
 
 
-export function voteOnComment(id: string, vote: string): Promise<IPost> {
+export function voteOnComment(id: string, vote: string): Promise<IComment> {
     return fetch(`${api}/comments/${id}`, {
         method: 'POST',
         headers: header,

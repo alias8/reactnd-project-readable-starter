@@ -172,7 +172,7 @@ export class PostPage extends React.Component<IProps, IState> {
         event.preventDefault();
         event.stopPropagation();
         API.deletePost(this.parentPostId)
-            .then(result => {
+            .then(() => {
                 this.setState({
                     parentPostDeleted: true
                 });
@@ -183,30 +183,27 @@ export class PostPage extends React.Component<IProps, IState> {
         event.preventDefault();
         event.stopPropagation();
         const target = event.target as HTMLButtonElement;
-        API.deleteComment(target.id)
+        API.deleteComment(target["data-event-id"])
             .then(result => {
-                return API.getCommentsForPost(this.parentPostId);
-            })
-            .then(result => {
+                const newComments = this.state.comments.filter(comment => comment.id !== result.id);
                 this.setState({
-                    comments: result
+                    comments: newComments
                 });
-            });
+            })
     }
 
-    voteOnComment = (event: React.MouseEvent<HTMLButtonElement>) => {
+    voteOnComment = (event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
         event.stopPropagation();
-        const target = event.target as HTMLButtonElement;
-        API.voteOnComment(target.id, target.name)
+        const target = event.target as HTMLDivElement;
+        API.voteOnComment(target["data-event-id"], target["data-event-action"])
             .then(result => {
-                return API.getCommentsForPost(this.parentPostId);
-            })
-            .then(result => {
+                const newComments = this.state.comments.filter(comment => comment.id !== result.id);
+                newComments.push(result);
                 this.setState({
-                    comments: result
+                    comments: newComments
                 });
-            });
+            })
     }
 
     voteOnPost = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -215,13 +212,10 @@ export class PostPage extends React.Component<IProps, IState> {
         const target = event.target as HTMLButtonElement;
         API.voteOnPost(target.id, target.name)
             .then(result => {
-                return API.getDetailsForOnePost(this.parentPostId)
-            })
-            .then(result => {
                 this.setState({
                     modifiedParentPostDetails: result
                 });
-            });
+            })
     }
 
     render() {
@@ -233,32 +227,41 @@ export class PostPage extends React.Component<IProps, IState> {
 
         let comments = this.state.comments.map((comment, index) => {
                 const commentBeingEdited = this.state.editChildId === comment.id;
+                const commentClassList = ["body-text-area"];
+                if (!commentBeingEdited) {
+                    commentClassList.push("no-outline-text-area");
+                }
                 return (
-                    <form key={index} className="comment" onSubmit={this.onEditChildCommentButtonClicked} id={comment.id}>
-                        <div>Author: {comment.author}</div>
-                        {commentBeingEdited ? (
-                            <input value={this.state.editedChildBody} readOnly={false} type="text" name="editedChildBody" onChange={this.handleChange}/>
-                        ) : (
-                            <input value={comment.body} readOnly={true} type="text"/>
-                        )}
-                        <div>Timestamp: {moment(comment.timestamp).fromNow()}</div>
-                        <div>VoteScore: {comment.voteScore}</div>
-                        {commentBeingEdited ? (
-                            <button type="submit">Submit changes</button>
-                        ) : (
-                            <button type="submit">Edit this comment</button>
-                        )}
-                        <button type="submit" id={comment.id} onClick={this.onDeleteChildCommentClicked}>Delete this comment</button>
-                        <button name="upVote" id={comment.id} onClick={this.voteOnComment}>upvote</button>
-                        <button name="downVote" id={comment.id} onClick={this.voteOnComment}>downvote</button>
-                    </form>
+                    <div>
+                        <div className={"vote-arrows"}>
+                            <div className={"arrow-up"} data-event-action="upVote" data-event-id={comment.id} onClick={this.voteOnComment}/>
+                            <div className={"arrow-separator"}>{comment.voteScore}</div>
+                            <div className={"arrow-down"} data-event-action="downVote" data-event-id={comment.id} onClick={this.voteOnComment}/>
+                        </div>
+                        <form key={index} className="comment" onSubmit={this.onEditChildCommentButtonClicked} id={comment.id}>
+                            <div>Author: {comment.author}</div>
+                            {commentBeingEdited ? (
+                                <Textarea className={commentClassList.join(" ")} value={this.state.editedChildBody} readOnly={false} type="text" name="editedChildBody" onChange={this.handleChange}/>
+                            ) : (
+                                <Textarea className={commentClassList.join(" ")} value={comment.body} readOnly={true} type="text"/>
+                            )}
+                            <div>Timestamp: {moment(comment.timestamp).fromNow()}</div>
+
+                            {commentBeingEdited ? (
+                                <button className={"edit-submit-delete-button"}>Submit</button>
+                            ) : (
+                                <button className={"edit-submit-delete-button"}>Edit</button>
+                            )}
+                            <button className={"edit-submit-delete-button"} data-event-id={comment.id} onClick={this.onDeleteChildCommentClicked}>Delete</button>
+                        </form>
+                    </div>
                 );
             }
         );
 
         const parentBeingEdited = this.state.editParentEnabled;
-        const parentClassList = ["post-body-text-area"];
-        if(!parentBeingEdited) {
+        const parentClassList = ["body-text-area"];
+        if (!parentBeingEdited) {
             parentClassList.push("no-outline-text-area");
         }
         return (
