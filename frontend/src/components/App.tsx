@@ -1,18 +1,15 @@
 import * as React from 'react';
 import { Link, NavLink, Route } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
-
-import PostList from './Category';
 import * as API from '../api/api';
 import { deletePostAction, updateCategoriesAction, updatePostsAction, voteOnPostAction } from '../actions/actions';
-import { PostPage } from './PostPage';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { ICategory, IPost } from '../types/types';
 import { RootState } from '../reducers/top';
-import { Redirect, RouteComponentProps, Switch } from 'react-router';
-import { NewPost } from './NewPost';
+import { Redirect, RouteComponentProps } from 'react-router';
 import * as moment from 'moment';
+import '../styles/App.scss';
 
 interface IState {
     editPostClicked: boolean;

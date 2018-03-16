@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as API from '../api/api';
-import '../styles/App.css';
 import { ChangeEvent, FormEvent } from 'react';
 import { IComment, IPost } from '../types/types';
 import * as moment from 'moment';
@@ -8,6 +7,8 @@ import { Redirect, RouteComponentProps, withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 import { connect, MapStateToProps } from "react-redux";
 import { RootState } from "../reducers/top";
+import Textarea from "react-textarea-autosize";
+import '../styles/App.scss';
 
 interface IState {
     comments: IComment[];
@@ -256,12 +257,17 @@ export class PostPage extends React.Component<IProps, IState> {
         );
 
         const parentBeingEdited = this.state.editParentEnabled;
+        const parentClassList = ["post-body-text-area"];
+        if(!parentBeingEdited) {
+            parentClassList.push("no-outline-text-area");
+        }
         return (
             <div>
                 <div className="upper">
                     <div className="post-vote-score">{this.state.modifiedParentPostDetails.voteScore}</div>
                     <div className="not-post-vote-score">
-                        <input
+                        <Textarea
+                            className={parentClassList.join(" ")}
                             name="parent_title"
                             value={this.state.modifiedParentPostDetails.title}
                             onChange={this.handleChange}
@@ -270,8 +276,10 @@ export class PostPage extends React.Component<IProps, IState> {
                         <div className="post-submitted-by">
                             Submitted {moment(this.state.modifiedParentPostDetails.timestamp).fromNow()} by {this.state.modifiedParentPostDetails.author}
                         </div>
+                        <hr/>
                         <div className="post-body">
-                            <textarea
+                            <Textarea
+                                className={parentClassList.join(" ")}
                                 name="parent_comment"
                                 value={this.state.modifiedParentPostDetails.body}
                                 onChange={this.handleChange}
@@ -296,7 +304,7 @@ export class PostPage extends React.Component<IProps, IState> {
                     <form onSubmit={this.handleSubmit}>
                         <label>
                             Your comment:
-                            <textarea
+                            <Textarea
                                 name="child_new_comment"
                                 className="input-box"
                                 value={this.state.childNewComment}

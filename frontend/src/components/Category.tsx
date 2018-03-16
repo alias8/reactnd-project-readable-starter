@@ -6,7 +6,7 @@ import { connect, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/top';
 import * as moment from 'moment';
 import { IPost } from '../types/types';
-import * as API from '../api/api';
+import '../styles/App.scss';
 
 interface IState {
     sortMethod: string;
