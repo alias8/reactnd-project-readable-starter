@@ -125,7 +125,7 @@ export class PostPage extends React.Component<IProps, IState> {
         }
     }
 
-    onEditTopCommentButtonClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onEditTopCommentButtonClicked = (event: FormEvent<EventTarget>) => {
         event.preventDefault();
         event.stopPropagation();
         if (this.state.editParentEnabled) {
@@ -183,7 +183,7 @@ export class PostPage extends React.Component<IProps, IState> {
         event.preventDefault();
         event.stopPropagation();
         const target = event.target as HTMLButtonElement;
-        API.deleteComment(target["data-event-id"])
+        API.deleteComment(target.dataset.eventId)
             .then(result => {
                 const newComments = this.state.comments.filter(comment => comment.id !== result.id);
                 this.setState({
@@ -196,7 +196,7 @@ export class PostPage extends React.Component<IProps, IState> {
         event.preventDefault();
         event.stopPropagation();
         const target = event.target as HTMLDivElement;
-        API.voteOnComment(target["data-event-id"], target["data-event-action"])
+        API.voteOnComment(target.dataset.eventId, target.dataset.eventAction)
             .then(result => {
                 const newComments = this.state.comments.filter(comment => comment.id !== result.id);
                 newComments.push(result);
@@ -206,11 +206,11 @@ export class PostPage extends React.Component<IProps, IState> {
             })
     }
 
-    voteOnPost = (event: React.MouseEvent<HTMLButtonElement>) => {
+    voteOnPost = (event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
         event.stopPropagation();
         const target = event.target as HTMLButtonElement;
-        API.voteOnPost(target.id, target.name)
+        API.voteOnPost(this.parentPostId, target.dataset.eventAction)
             .then(result => {
                 this.setState({
                     modifiedParentPostDetails: result
@@ -218,14 +218,37 @@ export class PostPage extends React.Component<IProps, IState> {
             })
     }
 
-    render() {
-        if (this.state.parentPostDeleted) {
-            return (
-                <Redirect to={'/'}/>
-            );
-        }
+    renderNewCommentSection() {
+        return (
+            <div className="lower">
+                <div className="comment">COMMENT SECTION</div>
+                <form onSubmit={this.handleSubmit}>
+                    <label>
+                        Your comment:
+                        <Textarea
+                            name="child_new_comment"
+                            className="input-box"
+                            value={this.state.childNewComment}
+                            onChange={this.handleChange}
+                        />
+                    </label>
+                    <label>
+                        Your name:
+                        <input
+                            type="text"
+                            name="child_new_author"
+                            value={this.state.childNewAuthor}
+                            onChange={this.handleChange}
+                        />
+                    </label>
+                    <input type="submit" value="Submit"/>
+                </form>
+            </div>
+        )
+    }
 
-        let comments = this.state.comments.map((comment, index) => {
+    renderChildCommentSection() {
+        return this.state.comments.map((comment, index) => {
                 const commentBeingEdited = this.state.editChildId === comment.id;
                 const commentClassList = ["body-text-area"];
                 if (!commentBeingEdited) {
@@ -240,94 +263,74 @@ export class PostPage extends React.Component<IProps, IState> {
                         </div>
                         <form key={index} className="comment" onSubmit={this.onEditChildCommentButtonClicked} id={comment.id}>
                             <div>Author: {comment.author}</div>
-                            {commentBeingEdited ? (
-                                <Textarea className={commentClassList.join(" ")} value={this.state.editedChildBody} readOnly={false} type="text" name="editedChildBody" onChange={this.handleChange}/>
-                            ) : (
-                                <Textarea className={commentClassList.join(" ")} value={comment.body} readOnly={true} type="text"/>
-                            )}
+                            <Textarea
+                                className={commentClassList.join(" ")}
+                                name="parent_comment"
+                                value={comment.body}
+                                onChange={this.handleChange}
+                                readOnly={!commentBeingEdited}
+                            />
                             <div>Timestamp: {moment(comment.timestamp).fromNow()}</div>
-
-                            {commentBeingEdited ? (
-                                <button className={"edit-submit-delete-button"}>Submit</button>
-                            ) : (
-                                <button className={"edit-submit-delete-button"}>Edit</button>
-                            )}
+                            <button className={"edit-submit-delete-button"}>{commentBeingEdited ? "Submit" : "Edit"}</button>
                             <button className={"edit-submit-delete-button"} data-event-id={comment.id} onClick={this.onDeleteChildCommentClicked}>Delete</button>
                         </form>
                     </div>
                 );
             }
         );
+    }
 
+    renderParentCommentSection() {
         const parentBeingEdited = this.state.editParentEnabled;
         const parentClassList = ["body-text-area"];
         if (!parentBeingEdited) {
             parentClassList.push("no-outline-text-area");
         }
+
+        return (
+            <div className="upper">
+
+                <div className={"vote-arrows"}>
+                    <div className={"arrow-up"} data-event-action="upVote" data-event-id={this.parentPostId} onClick={this.voteOnPost}/>
+                    <div className={"arrow-separator"}>{this.state.modifiedParentPostDetails.voteScore}</div>
+                    <div className={"arrow-down"} data-event-action="downVote" data-event-id={this.parentPostId} onClick={this.voteOnPost}/>
+                </div>
+
+                <form className="comment" onSubmit={this.onEditTopCommentButtonClicked} id={this.parentPostId}>
+                    <div>Author: {this.state.modifiedParentPostDetails.author}</div>
+                    <Textarea
+                        className={parentClassList.join(" ")}
+                        value={this.state.modifiedParentPostDetails.title}
+                        readOnly={parentBeingEdited}
+                        name="parent_title"
+                        onChange={this.handleChange}/>
+                    <Textarea
+                        className={parentClassList.join(" ")}
+                        name="parent_comment"
+                        value={this.state.modifiedParentPostDetails.body}
+                        onChange={this.handleChange}
+                        readOnly={!parentBeingEdited}
+                    />
+                    <div>Timestamp: {moment(this.state.modifiedParentPostDetails.timestamp).fromNow()}</div>
+                    <button className={"edit-submit-delete-button"}>{parentBeingEdited ? "Submit" : "Edit"}</button>
+                    <button className={"edit-submit-delete-button"} data-event-id={this.parentPostId} onClick={this.onDeleteChildCommentClicked}>Delete</button>
+                </form>
+            </div>
+        )
+    }
+
+    render() {
+        if (this.state.parentPostDeleted) {
+            return (
+                <Redirect to={'/'}/>
+            );
+        }
+
         return (
             <div>
-                <div className="upper">
-                    <div className="post-vote-score">{this.state.modifiedParentPostDetails.voteScore}</div>
-                    <div className="not-post-vote-score">
-                        <Textarea
-                            className={parentClassList.join(" ")}
-                            name="parent_title"
-                            value={this.state.modifiedParentPostDetails.title}
-                            onChange={this.handleChange}
-                            readOnly={!parentBeingEdited}
-                        />
-                        <div className="post-submitted-by">
-                            Submitted {moment(this.state.modifiedParentPostDetails.timestamp).fromNow()} by {this.state.modifiedParentPostDetails.author}
-                        </div>
-                        <hr/>
-                        <div className="post-body">
-                            <Textarea
-                                className={parentClassList.join(" ")}
-                                name="parent_comment"
-                                value={this.state.modifiedParentPostDetails.body}
-                                onChange={this.handleChange}
-                                readOnly={!parentBeingEdited}
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        {this.state.editParentEnabled ? (
-                            <button onClick={this.onEditTopCommentButtonClicked}>Submit changes</button>
-                        ) : (
-                            <button onClick={this.onEditTopCommentButtonClicked}>Edit this post</button>
-                        )}
-                        <button onClick={this.onDeleteTopCommentButtonClicked}>Delete this post</button>
-                        <button name="upVote" id={this.parentPostId} onClick={this.voteOnPost}>upvote</button>
-                        <button name="downVote" id={this.parentPostId} onClick={this.voteOnPost}>downvote</button>
-                    </div>
-                </div>
-
-                <div className="lower">
-                    <div className="comment">COMMENT SECTION</div>
-                    <form onSubmit={this.handleSubmit}>
-                        <label>
-                            Your comment:
-                            <Textarea
-                                name="child_new_comment"
-                                className="input-box"
-                                value={this.state.childNewComment}
-                                onChange={this.handleChange}
-                            />
-                        </label>
-                        <label>
-                            Your name:
-                            <input
-                                type="text"
-                                name="child_new_author"
-                                value={this.state.childNewAuthor}
-                                onChange={this.handleChange}
-                            />
-                        </label>
-                        <input type="submit" value="Submit"/>
-                    </form>
-
-                    {comments}
-                </div>
+                {this.renderParentCommentSection()}
+                {this.renderNewCommentSection()}
+                {this.renderChildCommentSection()}
             </div>
         );
     }
