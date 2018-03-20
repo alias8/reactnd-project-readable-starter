@@ -3,13 +3,14 @@ import { Link, NavLink, Route } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import * as API from '../api/api';
 import { deletePostAction, updateCategoriesAction, updatePostsAction, voteOnPostAction } from '../actions/actions';
-import { Component } from 'react';
+import { Component, FormEvent } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { ICategory, IPost } from '../types/types';
 import { RootState } from '../reducers/top';
 import { Redirect, RouteComponentProps } from 'react-router';
 import * as moment from 'moment';
 import '../styles/App.scss';
+import Textarea from "react-textarea-autosize";
 
 interface IState {
     editPostClicked: boolean;
@@ -32,6 +33,7 @@ type IProps = IOwnProps & IMappedProps & DispatchProp<{}> & RouteComponentProps<
 class App extends Component<IProps, IState> {
     private TIME_STAMP: string;
     private VOTE_SCORE: string;
+
     constructor(props: IProps) {
         super(props);
         this.VOTE_SCORE = 'VOTE_SCORE';
@@ -96,7 +98,7 @@ class App extends Component<IProps, IState> {
             })
     }
 
-    voteOnPost = (event: React.MouseEvent<HTMLButtonElement>) => {
+    voteOnPost = (event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
         event.stopPropagation();
         const target = event.target as HTMLButtonElement;
@@ -106,7 +108,7 @@ class App extends Component<IProps, IState> {
             })
     }
 
-    onEditPostClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onEditPostClicked = (event: FormEvent<EventTarget>) => {
         event.preventDefault();
         event.stopPropagation();
         const target = event.target as HTMLButtonElement;
@@ -126,28 +128,52 @@ class App extends Component<IProps, IState> {
     renderCategoryLinks() {
         return this.props.posts
             .sort((a, b) => {
-                if(this.state.sortMethod === this.VOTE_SCORE) {
+                if (this.state.sortMethod === this.VOTE_SCORE) {
                     return b.voteScore - a.voteScore
                 } else {
                     return b.timestamp - a.timestamp
                 }
             })
-            .map((post, index) => (
-            <div key={index}>
-                <Link
-                    to={`${post.category}/posts/${post.id}`}
-                >
-                    {post.title}
-                </Link>
-                <div>{`submitted ${moment(post.timestamp).fromNow()} by ${post.author} to ${post.category}`}</div>
-                <div>{`${post.commentCount} comments`}</div>
-                <div>Vote score: {post.voteScore}</div>
-                <button type="submit" id={post.id} name={post.category} onClick={this.onEditPostClicked}>Edit this comment</button>
-                <button type="submit" id={post.id} onClick={this.onDeletePostClicked}>Delete this comment</button>
-                <button name="upVote" id={post.id} onClick={this.voteOnPost}>upvote</button>
-                <button name="downVote" id={post.id} onClick={this.voteOnPost}>downvote</button>
-            </div>
-        ));
+            .map((post, index) => {
+                const editPostClicked = this.state.editPostClicked;
+                const commentClassList = ["body-text-area"];
+                if (!editPostClicked) {
+                    commentClassList.push("no-outline-text-area");
+                }
+
+                return (
+                    <div key={index}>
+                        <div>
+                            <div className={"vote-arrows"}>
+                                <div className={"arrow-up"} data-event-action="upVote" data-event-id={post.id} onClick={this.voteOnPost}/>
+                                <div className={"arrow-separator"}>{post.voteScore}</div>
+                                <div className={"arrow-down"} data-event-action="downVote" data-event-id={post.id} onClick={this.voteOnPost}/>
+                            </div>
+                            <form key={index} className="comment" onSubmit={this.onEditPostClicked} id={post.id}>
+                                <div>Author: {post.author}</div>
+                                {editPostClicked ? (
+                                    <Textarea
+                                        className={commentClassList.join(" ")}
+                                        name="parent_comment"
+                                        value={post.title}
+                                        onChange={this.handleChange}
+                                        readOnly={!editPostClicked}
+                                    />
+                                ): (
+                                    <Link
+                                        to={`${post.category}/posts/${post.id}`}
+                                    >
+                                        {post.title}
+                                    </Link>
+                                )}
+                                <div>Timestamp: {moment(post.timestamp).fromNow()}</div>
+                                <button className={"edit-submit-delete-button"}>{editPostClicked ? "Submit" : "Edit"}</button>
+                                <button className={"edit-submit-delete-button"} data-event-id={post.id} onClick={this.onDeletePostClicked}>Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                )
+            });
     }
 
     render() {
