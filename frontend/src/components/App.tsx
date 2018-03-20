@@ -5,12 +5,13 @@ import * as API from '../api/api';
 import { deletePostAction, updateCategoriesAction, updatePostsAction, voteOnPostAction } from '../actions/actions';
 import { Component, FormEvent } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
-import { ICategory, IPost } from '../types/types';
+import { ICategory, IPost, PageType } from '../types/types';
 import { RootState } from '../reducers/top';
 import { Redirect, RouteComponentProps } from 'react-router';
 import * as moment from 'moment';
 import '../styles/App.scss';
 import Textarea from "react-textarea-autosize";
+import { Template } from "./Template";
 
 interface IState {
     editPostClicked: boolean;
@@ -140,6 +141,16 @@ class App extends Component<IProps, IState> {
                 if (!editPostClicked) {
                     commentClassList.push("no-outline-text-area");
                 }
+
+                return (
+                    <Template
+                        title={post.title}
+                        body={post.body}
+                        timestamp={post.timestamp}
+                        author={post.author}
+                        type={PageType.POST}
+                    />
+                )
 
                 return (
                     <div key={index}>
