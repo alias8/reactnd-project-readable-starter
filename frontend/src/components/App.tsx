@@ -126,63 +126,29 @@ class App extends Component<IProps, IState> {
         });
     }
 
+    newOnSubmit = (event: FormEvent<EventTarget>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const target = event.target as HTMLButtonElement;
+    }
+
     renderCategoryLinks() {
         return this.props.posts
-            .sort((a, b) => {
-                if (this.state.sortMethod === this.VOTE_SCORE) {
-                    return b.voteScore - a.voteScore
-                } else {
-                    return b.timestamp - a.timestamp
-                }
-            })
+            .sort((a, b) => this.state.sortMethod === this.VOTE_SCORE ? b.voteScore - a.voteScore : b.timestamp - a.timestamp)
             .map((post, index) => {
-                const editPostClicked = this.state.editPostClicked;
-                const commentClassList = ["body-text-area"];
-                if (!editPostClicked) {
-                    commentClassList.push("no-outline-text-area");
-                }
-
                 return (
                     <Template
+                        ID={post.id}
                         title={post.title}
                         body={post.body}
                         timestamp={post.timestamp}
                         author={post.author}
-                        type={PageType.POST}
+                        type={PageType.LISTED_POST}
+                        beingEdited={false}
+                        voteScore={post.voteScore}
+                        onSubmit={this.newOnSubmit}
+                        key={index}
                     />
-                )
-
-                return (
-                    <div key={index}>
-                        <div>
-                            <div className={"vote-arrows"}>
-                                <div className={"arrow-up"} data-event-action="upVote" data-event-id={post.id} onClick={this.voteOnPost}/>
-                                <div className={"arrow-separator"}>{post.voteScore}</div>
-                                <div className={"arrow-down"} data-event-action="downVote" data-event-id={post.id} onClick={this.voteOnPost}/>
-                            </div>
-                            <form key={index} className="comment" onSubmit={this.onEditPostClicked} id={post.id}>
-                                <div>Author: {post.author}</div>
-                                {editPostClicked ? (
-                                    <Textarea
-                                        className={commentClassList.join(" ")}
-                                        name="parent_comment"
-                                        value={post.title}
-                                        onChange={this.handleChange}
-                                        readOnly={!editPostClicked}
-                                    />
-                                ): (
-                                    <Link
-                                        to={`${post.category}/posts/${post.id}`}
-                                    >
-                                        {post.title}
-                                    </Link>
-                                )}
-                                <div>Timestamp: {moment(post.timestamp).fromNow()}</div>
-                                <button className={"edit-submit-delete-button"}>{editPostClicked ? "Submit" : "Edit"}</button>
-                                <button className={"edit-submit-delete-button"} data-event-id={post.id} onClick={this.onDeletePostClicked}>Delete</button>
-                            </form>
-                        </div>
-                    </div>
                 )
             });
     }

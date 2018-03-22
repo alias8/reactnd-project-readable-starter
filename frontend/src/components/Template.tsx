@@ -6,6 +6,7 @@ import { updateCategoriesAction, updatePostsAction } from "../actions/actions";
 import Textarea from "react-textarea-autosize";
 import * as moment from 'moment';
 import { PageType } from "../types/types";
+import { FormEvent } from "react";
 
 interface IState {
 
@@ -16,15 +17,18 @@ interface IMappedProps {
 }
 
 interface IOwnProps {
+    ID: string;
     title: string;
     body: string;
     beingEdited: boolean;
     timestamp: number;
     author: string;
     type: PageType;
+    voteScore: number;
+    onSubmit: (event: FormEvent<EventTarget>) => void;
 }
 
-type IProps = IOwnProps & IMappedProps & DispatchProp<{}> & RouteComponentProps<{}>;
+type IProps = IOwnProps;
 
 export class Template extends React.Component<IProps, IState> {
     constructor(props: IProps) {
@@ -46,14 +50,16 @@ export class Template extends React.Component<IProps, IState> {
                             value={this.props.title}
                             readOnly={this.props.beingEdited}
                         />
+                        {this.props.type !== PageType.LISTED_POST &&
                         <Textarea
                             data-event-action="body"
                             value={this.props.body}
                             readOnly={this.props.beingEdited}
                         />
-                        <div>Timestamp: {moment(this.props.timestamp).fromNow()}</div>
-                        <div>Author: {this.props.author}</div>
-
+                        }
+                    </div>
+                    <div>
+                        <div>submitted by {this.props.author} {moment(this.props.timestamp).fromNow()}</div>
                         <button className={"edit-submit-delete-button"}>{this.props.beingEdited ? "Submit" : "Edit"}</button>
                         <button className={"edit-submit-delete-button"} data-event-action="delete">Delete</button>
                     </div>
