@@ -25,7 +25,17 @@ interface IOwnProps {
     author: string;
     type: PageType;
     voteScore: number;
-    onSubmit: (event: FormEvent<EventTarget>) => void;
+    onSubmit: (event: IEvent) => void;
+    category: string;
+}
+
+export interface IEvent extends IOwnProps {
+    action: eventActions
+}
+
+export enum eventActions {
+    UPVOTE = "upVote",
+    DOWNVOTE = "downVote"
 }
 
 type IProps = IOwnProps;
@@ -35,14 +45,22 @@ export class Template extends React.Component<IProps, IState> {
         super(props);
     }
 
+    clickHandle = (event) => {
+        const myEvent = {
+                ...this.props,
+            action: event.target.dataset.eventAction
+        };
+        this.props.onSubmit(myEvent);
+    };
+
     render() {
         return (
             <div>
-                <form className="comment" onSubmit={this.props.onSubmit} data-event-id={this.props.ID}>
+                <div className="comment">
                     <div className={"vote-arrows"}>
-                        <button className={"arrow-up"} data-event-action="upVote"/>
+                        <button className={"arrow-up"} data-event-action={eventActions.UPVOTE} onClick={this.clickHandle}/>
                         <div className={"arrow-separator"}>{this.props.voteScore}</div>
-                        <button className={"arrow-down"} data-event-action="downVote"/>
+                        <button className={"arrow-down"} data-event-action={eventActions.DOWNVOTE} onClick={this.clickHandle}/>
                     </div>
                     <div>
                         <Textarea
@@ -59,11 +77,11 @@ export class Template extends React.Component<IProps, IState> {
                         }
                     </div>
                     <div>
-                        <div>submitted by {this.props.author} {moment(this.props.timestamp).fromNow()}</div>
+                        <div>submitted by {this.props.author} {moment(this.props.timestamp).fromNow()} {this.props.type === PageType.LISTED_POST ? `to ${this.props.category}`:``}</div>
                         <button className={"edit-submit-delete-button"}>{this.props.beingEdited ? "Submit" : "Edit"}</button>
                         <button className={"edit-submit-delete-button"} data-event-action="delete">Delete</button>
                     </div>
-                </form>
+                </div>
             </div>
         )
     }

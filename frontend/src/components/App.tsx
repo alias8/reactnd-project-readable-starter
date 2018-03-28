@@ -11,7 +11,7 @@ import { Redirect, RouteComponentProps } from 'react-router';
 import * as moment from 'moment';
 import '../styles/App.scss';
 import Textarea from "react-textarea-autosize";
-import { Template } from "./Template";
+import { eventActions, IEvent, Template } from "./Template";
 
 interface IState {
     editPostClicked: boolean;
@@ -126,11 +126,17 @@ class App extends Component<IProps, IState> {
         });
     }
 
-    newOnSubmit = (event: FormEvent<EventTarget>) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const target = event.target as HTMLButtonElement;
-    }
+    newOnSubmit = (event: IEvent) => {
+        switch (event.action) {
+            case eventActions.UPVOTE:
+            case eventActions.DOWNVOTE:
+                API.voteOnPost(event.ID, event.action)
+                    .then((result) => {
+                        this.props.dispatch(voteOnPostAction(result))
+                    })
+
+        }
+    };
 
     renderCategoryLinks() {
         return this.props.posts
@@ -139,6 +145,7 @@ class App extends Component<IProps, IState> {
                 return (
                     <Template
                         ID={post.id}
+                        category={post.category}
                         title={post.title}
                         body={post.body}
                         timestamp={post.timestamp}
