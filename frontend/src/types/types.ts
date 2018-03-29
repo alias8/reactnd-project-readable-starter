@@ -27,8 +27,8 @@ export interface ICategory {
 }
 
 export enum PageType {
-    LISTED_POST = "LISTED_POST",
-    POST = "POST",
-    COMMENT = "COMMENT"
+    LISTED_POST = 'LISTED_POST',
+    POST = 'POST',
+    COMMENT = 'COMMENT'
 
 }

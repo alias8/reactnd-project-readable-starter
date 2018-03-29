@@ -1,8 +1,8 @@
-export const UPDATE_POSTS = 'UPDATE_POSTS'
+export const UPDATE_POSTS = 'UPDATE_POSTS';
 export const DELETE_POST = 'DELETE_POST';
 export const VOTE_ON_POST = 'VOTE_ON_POST';
-export const UPDATE_CATEGORIES = 'UPDATE_CATEGORIES'
-
+export const UPDATE_CATEGORIES = 'UPDATE_CATEGORIES';
+export const CHANGE_EDITED = 'CHANGE_EDITED';
 
 export function updatePostsAction(posts) {
     return {
@@ -24,7 +24,7 @@ export function voteOnPostAction(post) {
     return {
         type: VOTE_ON_POST,
         post: post
-    }
+    };
 }
 
 export function updateCategoriesAction(categories) {
@@ -32,6 +32,13 @@ export function updateCategoriesAction(categories) {
         type: UPDATE_CATEGORIES,
         categories: categories
 
+    };
+}
+
+export function changeEditedID(id) {
+    return {
+        type: CHANGE_EDITED,
+        editedID: id
     };
 }
 

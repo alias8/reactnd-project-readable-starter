@@ -1,18 +1,9 @@
 import * as React from 'react';
-import { DispatchProp } from 'react-redux';
-import { RouteComponentProps } from 'react-router';
-import * as API from '../api/api';
-import { updateCategoriesAction, updatePostsAction } from "../actions/actions";
-import Textarea from "react-textarea-autosize";
+import Textarea from 'react-textarea-autosize';
 import * as moment from 'moment';
-import { PageType } from "../types/types";
-import { FormEvent } from "react";
+import { PageType } from '../types/types';
 
 interface IState {
-
-}
-
-interface IMappedProps {
 
 }
 
@@ -30,12 +21,13 @@ interface IOwnProps {
 }
 
 export interface IEvent extends IOwnProps {
-    action: eventActions
+    action: eventActions;
 }
 
 export enum eventActions {
-    UPVOTE = "upVote",
-    DOWNVOTE = "downVote"
+    UPVOTE = 'upVote',
+    DOWNVOTE = 'downVote',
+    EDIT = 'EDIT'
 }
 
 type IProps = IOwnProps;
@@ -51,16 +43,16 @@ export class Template extends React.Component<IProps, IState> {
             action: event.target.dataset.eventAction
         };
         this.props.onSubmit(myEvent);
-    };
+    }
 
     render() {
         return (
             <div>
                 <div className="comment">
-                    <div className={"vote-arrows"}>
-                        <button className={"arrow-up"} data-event-action={eventActions.UPVOTE} onClick={this.clickHandle}/>
-                        <div className={"arrow-separator"}>{this.props.voteScore}</div>
-                        <button className={"arrow-down"} data-event-action={eventActions.DOWNVOTE} onClick={this.clickHandle}/>
+                    <div className={'vote-arrows'}>
+                        <button className={'arrow-up'} data-event-action={eventActions.UPVOTE} onClick={this.clickHandle}/>
+                        <div className={'arrow-separator'}>{this.props.voteScore}</div>
+                        <button className={'arrow-down'} data-event-action={eventActions.DOWNVOTE} onClick={this.clickHandle}/>
                     </div>
                     <div>
                         <Textarea
@@ -77,12 +69,17 @@ export class Template extends React.Component<IProps, IState> {
                         }
                     </div>
                     <div>
-                        <div>submitted by {this.props.author} {moment(this.props.timestamp).fromNow()} {this.props.type === PageType.LISTED_POST ? `to ${this.props.category}`:``}</div>
-                        <button className={"edit-submit-delete-button"}>{this.props.beingEdited ? "Submit" : "Edit"}</button>
-                        <button className={"edit-submit-delete-button"} data-event-action="delete">Delete</button>
+                        <div>submitted by {this.props.author} {moment(this.props.timestamp).fromNow()} {this.props.type === PageType.LISTED_POST ? `to ${this.props.category}` : ``}</div>
+                        <button
+                            className={'edit-submit-delete-button'}
+                            data-event-action={eventActions.EDIT}
+                            onClick={this.clickHandle}
+                        >{this.props.beingEdited ? 'Submit' : 'Edit'}
+                        </button>
+                        <button className={'edit-submit-delete-button'} data-event-action="delete">Delete</button>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }

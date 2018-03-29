@@ -87,7 +87,7 @@ class Category extends Component<IProps, IState> {
 
 const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
     posts: state.posts.posts.filter(post => {
-        return post.category === props.match.params.category
+        return post.category === props.match.params.category;
     })
 });
 

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Link, NavLink, Route } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import * as API from '../api/api';
-import { deletePostAction, updateCategoriesAction, updatePostsAction, voteOnPostAction } from '../actions/actions';
+import { changeEditedID, deletePostAction, updateCategoriesAction, updatePostsAction, voteOnPostAction } from '../actions/actions';
 import { Component, FormEvent } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { ICategory, IPost, PageType } from '../types/types';
@@ -10,8 +10,8 @@ import { RootState } from '../reducers/top';
 import { Redirect, RouteComponentProps } from 'react-router';
 import * as moment from 'moment';
 import '../styles/App.scss';
-import Textarea from "react-textarea-autosize";
-import { eventActions, IEvent, Template } from "./Template";
+import Textarea from 'react-textarea-autosize';
+import { eventActions, IEvent, Template } from './Template';
 
 interface IState {
     editPostClicked: boolean;
@@ -22,7 +22,8 @@ interface IState {
 
 interface IMappedProps {
     posts: IPost[];
-    categories: ICategory[]
+    categories: ICategory[];
+    beingEdited: string;
 }
 
 interface IOwnProps {
@@ -95,8 +96,8 @@ class App extends Component<IProps, IState> {
         const target = event.target as HTMLButtonElement;
         API.deletePost(target.id)
             .then((result) => {
-                this.props.dispatch(deletePostAction(result))
-            })
+                this.props.dispatch(deletePostAction(result));
+            });
     }
 
     voteOnPost = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -105,8 +106,8 @@ class App extends Component<IProps, IState> {
         const target = event.target as HTMLButtonElement;
         API.voteOnPost(target.id, target.name)
             .then((result) => {
-                this.props.dispatch(voteOnPostAction(result))
-            })
+                this.props.dispatch(voteOnPostAction(result));
+            });
     }
 
     onEditPostClicked = (event: FormEvent<EventTarget>) => {
@@ -132,11 +133,15 @@ class App extends Component<IProps, IState> {
             case eventActions.DOWNVOTE:
                 API.voteOnPost(event.ID, event.action)
                     .then((result) => {
-                        this.props.dispatch(voteOnPostAction(result))
-                    })
-
+                        this.props.dispatch(voteOnPostAction(result));
+                    });
+                break;
+            case eventActions.EDIT:
+                this.props.dispatch(changeEditedID(event.ID));
+                break;
+            default:
         }
-    };
+    }
 
     renderCategoryLinks() {
         return this.props.posts
@@ -151,12 +156,12 @@ class App extends Component<IProps, IState> {
                         timestamp={post.timestamp}
                         author={post.author}
                         type={PageType.LISTED_POST}
-                        beingEdited={false}
+                        beingEdited={this.props.beingEdited === post.id}
                         voteScore={post.voteScore}
                         onSubmit={this.newOnSubmit}
                         key={index}
                     />
-                )
+                );
             });
     }
 
@@ -185,7 +190,8 @@ class App extends Component<IProps, IState> {
 
 const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
     posts: state.posts.posts,
-    categories: state.categories.categories
+    categories: state.categories.categories,
+    beingEdited: state.beingEdited.beingEdited
 });
 
 export default withRouter<any>(connect(mapStateToProps)(App));

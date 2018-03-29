@@ -115,7 +115,6 @@ export function voteOnPost(id: string, vote: string): Promise<IPost> {
 }
 //
 
-
 export function editDetailsOfExistingPost(id: string, title: string, body: string): Promise<IPost> {
     return fetch(`${api}/posts/${id}`, {
         method: 'PUT',
@@ -148,7 +147,6 @@ export function deletePost(id: string): Promise<IPost> {
 //     Get the details for a single comment
 //
 
-
 export function voteOnComment(id: string, vote: string): Promise<IComment> {
     return fetch(`${api}/comments/${id}`, {
         method: 'POST',
@@ -161,7 +159,6 @@ export function voteOnComment(id: string, vote: string): Promise<IComment> {
         .then(data => data)
         .catch(error => error);
 }
-
 
 export function editDetailsOfExistingComment(id: string, body: string): Promise<IComment> {
     return fetch(`${api}/comments/${id}`, {

@@ -30,7 +30,7 @@
     "sw-precache-webpack-plugin": "0.11.4",
     "ts-jest": "^20.0.7",
     "ts-loader": "^2.3.7",
-    "tslint": "^5.7.0",
+    "tslint": "^5.9.1",
     "tslint-loader": "^3.5.3",
     "tslint-react": "^3.2.0",
     "typescript": "~2.5.3",
@@ -44,7 +44,8 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "mylint": "tslint --fix src/**/*.ts{,x}"
   },
   "devDependencies": {
     "@types/jest": "^22.0.0",
