@@ -1,21 +1,28 @@
 import { ICategory, IPost } from '../types/types';
 import { Reducer } from 'redux';
-import { CHANGE_EDITED, IAction, UPDATE_CATEGORIES } from '../actions/actions';
+import { CHANGE_EDITED_ID, CHANGE_EDITED_TITLE, IAction, UPDATE_CATEGORIES } from '../actions/actions';
 
 export type EditState = {
-    beingEdited: string;
+    beingEditedID: string;
+    beingEditedTitle: string;
 };
 
 const initialState: EditState = {
-    beingEdited: ''
+    beingEditedID: '',
+    beingEditedTitle: ''
 };
 
 const reducer: Reducer<EditState> = (state = initialState, action: IAction) => {
     switch (action.type) {
-        case CHANGE_EDITED:
+        case CHANGE_EDITED_ID:
             return {
                 ...state,
-                beingEdited: action.editedID
+                beingEditedID: action.editedID
+            };
+        case CHANGE_EDITED_TITLE:
+            return {
+                ...state,
+                beingEditedTitle: action.editedTitle
             };
         default:
             return state;

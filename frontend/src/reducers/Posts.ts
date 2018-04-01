@@ -1,6 +1,6 @@
 import { IPost } from '../types/types';
 import { Reducer } from 'redux';
-import { DELETE_POST, IAction, UPDATE_POSTS, VOTE_ON_POST } from '../actions/actions';
+import { DELETE_POST, EDIT_ONE_POST, IAction, UPDATE_POSTS, VOTE_ON_POST } from '../actions/actions';
 
 export type PostState = {
     posts: IPost[]
@@ -26,6 +26,13 @@ const reducer: Reducer<PostState> = (state = initialState, action: IAction) => {
             return {
                 ...state,
                 posts: state.posts.map(post => post.id === action.post.id ? action.post : post)
+            };
+        case EDIT_ONE_POST:
+            const newPostList =  state.posts.filter(post => post.id !== action.post.id);
+            newPostList.push(action.post);
+            return {
+                ...state,
+                posts: newPostList
             };
         default:
             return state;
