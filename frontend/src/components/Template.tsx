@@ -14,7 +14,7 @@ interface IOwnProps {
     ID: string;
     title: string;
     body: string;
-    beingEditedID: boolean;
+    beingEdited: boolean;
     timestamp: number;
     author: string;
     type: PageType;
@@ -69,8 +69,32 @@ export class Template extends React.Component<IProps, IState> {
 
     render() {
         const textAreaClassNames = ['no-black-outline-textbox', 'post-title'];
-        if (!this.props.beingEditedID) {
+        if (!this.props.beingEdited) {
             textAreaClassNames.push('no-blue-highlight-text-area');
+        }
+        const titleAsLink = (
+            <Link to={`${this.props.category}/posts/${this.props.ID}`}>
+                {this.state.editedTitle}
+            </Link>
+        );
+        const titleAsTextArea = (
+                <Textarea
+                    data-event-action={eventActions.CHANGE_EDITED_TITLE}
+                    value={this.state.editedTitle}
+                    readOnly={!this.props.beingEdited}
+                    onChange={this.handleChange}
+                    className={textAreaClassNames.join(' ')}
+                />
+            );
+        let title;
+        if (this.props.type === PageType.POST) {
+            title = titleAsTextArea;
+        } else {
+            if (this.props.beingEdited) {
+                title = titleAsTextArea;
+            } else {
+                title = titleAsLink;
+            }
         }
         return (
             <div>
@@ -89,22 +113,18 @@ export class Template extends React.Component<IProps, IState> {
                         />
                     </div>
                     <div className={'comment-right-side'}>
-                        <Textarea
-                            data-event-action={eventActions.CHANGE_EDITED_TITLE}
-                            value={this.state.editedTitle}
-                            readOnly={!this.props.beingEditedID}
-                            onChange={this.handleChange}
-                            className={textAreaClassNames.join(' ')}
-                        />
+                        {title}
                         {this.props.type !== PageType.LISTED_POST &&
                         <Textarea
                             data-event-action="body"
                             value={this.props.body}
-                            readOnly={!this.props.beingEditedID}
+                            readOnly={!this.props.beingEdited}
                         />
                         }
                         <div className={'post-extra-info'}>
-                            <div className={'first-line'}>submitted {moment(this.props.timestamp).fromNow()} by {this.props.author}
+                            <div
+                                className={'first-line'}
+                            >submitted {moment(this.props.timestamp).fromNow()} by {this.props.author}
                                 {this.props.type === PageType.LISTED_POST &&
                                 <span> to <Link to={`${this.props.category}/posts`}>{this.props.category}</Link>
                             </span>
@@ -114,11 +134,11 @@ export class Template extends React.Component<IProps, IState> {
                                 <span>{this.props.commentCount} comments </span>
                                 <button
                                     className={'edit-submit-delete-button'}
-                                    data-event-action={this.props.beingEditedID ?
+                                    data-event-action={this.props.beingEdited ?
                                         eventActions.CLEAR_EDIT_ID :
                                         eventActions.CHANGE_EDIT_ID}
                                     onClick={this.clickHandle}
-                                >{this.props.beingEditedID ? 'Submit' : 'Edit'}
+                                >{this.props.beingEdited ? 'Submit' : 'Edit'}
                                 </button>
                                 <button
                                     className={'edit-submit-delete-button'}

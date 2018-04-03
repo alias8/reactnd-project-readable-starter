@@ -72,9 +72,10 @@ textarea {
 }
 
 .no-black-outline-textbox {
-  border:none;
+  border: none;
   resize: none;
   width: 100%;
+  padding: 0;
 }
 
 .post-title {
@@ -130,22 +131,6 @@ textarea {
 
 .add-new-post-input {
   display: block;
-}
-
-.post-list {
-  width: 80%;
-  display: inline-block;
-}
-
-.add-new-post {
-  display: inline-block;
-  width: 20%;
-  text-align: center;
-  top: 50%;
-  position: relative;
-  height: 300px;
-  transform: translateY(-50%);
-  border: 2px solid black;
 }
 
 .thick-hr {
@@ -233,6 +218,21 @@ $vertical-separator-height: 30px;
   padding-left: 10px;
   padding-top: 10px;
 }
+
+.main-flex-container {
+  $post-list-width: 80%;
+  display: flex;
+  align-items: center;
+  .post-list {
+    width: $post-list-width;
+  }
+  .add-new-post {
+    width: 100% - $post-list-width;
+    text-align: center;
+  }
+}
+
+
 
 
 

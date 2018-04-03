@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ICategory, IPost, PageType } from '../types/types';
+import { ICategory, IComment, IPost, PageType } from '../types/types';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
@@ -27,6 +27,7 @@ interface IMappedProps {
 interface IOwnProps {
     pageType: PageType;
     posts: IPost[];
+    itemsList: IPost[] | IComment[];
 }
 
 type IProps = IOwnProps & IMappedProps & DispatchProp<{}>;
@@ -126,43 +127,72 @@ class TopSection extends Component<IProps, IState> {
         }
     }
 
-    renderPosts() {
-        return this.props.posts
-            .sort((a, b) =>
-                this.state.sortMethod === this.VOTE_SCORE ?
-                    b.voteScore - a.voteScore :
-                    b.timestamp - a.timestamp)
-            .map((post, index) => {
-                const beingEdited = this.props.beingEditedID === post.id;
-                return (
-                    <Template
-                        ID={post.id}
-                        category={post.category}
-                        title={post.title}
-                        body={post.body}
-                        timestamp={post.timestamp}
-                        author={post.author}
-                        type={this.props.pageType}
-                        beingEditedID={beingEdited}
-                        voteScore={post.voteScore}
-                        onSubmit={this.newOnSubmit}
-                        commentCount={post.commentCount}
-                        key={index}
-                    />
-                );
-            });
+    isComment(obj: IComment[] | IPost[]): obj is IComment[] {
+        const objTest = obj as IComment[];
+        return objTest[0].parentDeleted !== undefined;
+    }
+
+    renderList() {
+        if (this.isComment(this.props.itemsList)) {
+            return this.props.itemsList
+                .sort((a, b) =>
+                    this.state.sortMethod === this.VOTE_SCORE ?
+                        b.voteScore - a.voteScore :
+                        b.timestamp - a.timestamp)
+                .map((comment, index) => {
+                    const beingEdited = this.props.beingEditedID === comment.id;
+                    return (
+                        <Template
+                            ID={comment.id}
+                            category={comment.category}
+                            title={comment.title}
+                            body={comment.body}
+                            timestamp={comment.timestamp}
+                            author={comment.author}
+                            type={this.props.pageType}
+                            beingEdited={beingEdited}
+                            voteScore={comment.voteScore}
+                            onSubmit={this.newOnSubmit}
+                            commentCount={comment.commentCount}
+                            key={index}
+                        />
+                    );
+                });
+        } else {
+            return this.props.itemsList
+                .sort((a, b) =>
+                    this.state.sortMethod === this.VOTE_SCORE ?
+                        b.voteScore - a.voteScore :
+                        b.timestamp - a.timestamp)
+                .map((post, index) => {
+                    const beingEdited = this.props.beingEditedID === post.id;
+                    return (
+                        <Template
+                            ID={post.id}
+                            category={post.category}
+                            title={post.title}
+                            body={post.body}
+                            timestamp={post.timestamp}
+                            author={post.author}
+                            type={this.props.pageType}
+                            beingEdited={beingEdited}
+                            voteScore={post.voteScore}
+                            onSubmit={this.newOnSubmit}
+                            commentCount={post.commentCount}
+                            key={index}
+                        />
+                    );
+                });
+        }
     }
 
     render() {
-        /*
-        * TODO: practice using CSS grid to see if it can do the inline-block style for the "new post" block
-        * */
         return (
-            x =
             <div>
                 <div className={'top-navlink-container'}>
                     {this.formLinksFromCategories()}
-                    </div>
+                </div>
+                {this.props.pageType === PageType.LISTED_POST &&
                 <div className={'sort-container'}>
                     <div>Sort:</div>
                     <select value={this.state.sortMethod} onChange={this.handleChange}>
@@ -170,15 +200,19 @@ class TopSection extends Component<IProps, IState> {
                         <option value={this.TIME_STAMP}>Time (newest first)</option>
                     </select>
                 </div>
+                }
                 <hr className={'thick-hr'}/>
-                <div className={'post-list'}>
-                    {this.renderPosts()}
+                <div className={'main-flex-container'}>
+                    <div className={'post-list'}>
+                        {this.renderList()}
+                    </div>
+                    <div className={'add-new-post'}>
+                        <Link to={`/new`}>
+                            Submit new post
+                        </Link>
+                    </div>
                 </div>
-                <div className={'add-new-post'}>
-                    <Link to={`/new`}>
-                        Submit new post
-                    </Link>
-                </div>
+
             </div>
         );
     }
