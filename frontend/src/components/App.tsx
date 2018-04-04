@@ -6,7 +6,7 @@ import { IPost, PageType } from '../types/types';
 import { RootState } from '../reducers/top';
 import { Redirect, RouteComponentProps } from 'react-router';
 import '../styles/App.scss';
-import TopSection from './TopSection';
+import TemplateCollection from './TemplateCollection';
 
 interface IState {
 
@@ -29,9 +29,9 @@ class App extends Component<IProps, IState> {
 
     render() {
         return (
-            <TopSection
+            <TemplateCollection
                 pageType={PageType.LISTED_POST}
-                posts={this.props.posts}
+                itemsList={this.props.posts}
             />
         );
     }

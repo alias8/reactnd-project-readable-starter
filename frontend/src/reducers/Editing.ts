@@ -19,11 +19,6 @@ const reducer: Reducer<EditState> = (state = initialState, action: IAction) => {
                 ...state,
                 beingEditedID: action.editedID
             };
-        case CHANGE_EDITED_TITLE:
-            return {
-                ...state,
-                beingEditedTitle: action.editedTitle
-            };
         default:
             return state;
     }

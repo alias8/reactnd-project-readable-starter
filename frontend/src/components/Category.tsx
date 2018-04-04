@@ -5,7 +5,7 @@ import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/top';
 import { IPost, PageType } from '../types/types';
 import '../styles/App.scss';
-import TopSection from './TopSection';
+import TemplateCollection from './TemplateCollection';
 
 interface IState {
     sortMethod: string;
@@ -28,9 +28,9 @@ type IProps = IOwnProps & IMappedProps & DispatchProp<{}> & RouteComponentProps<
 class Category extends Component<IProps, IState> {
     render() {
         return (
-            <TopSection
+            <TemplateCollection
                 pageType={PageType.LISTED_POST}
-                posts={this.props.posts}
+                itemsList={this.props.posts}
             />
         );
     }

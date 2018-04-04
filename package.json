@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "frontend": "cd frontend && yarn run start",
+    "server": "cd api-server && node server",
+    "install-frontend": "cd frontend && yarn",
+    "install-server": "cd api-server && yarn",
+    "install-all": " yarn install-server && yarn install-frontend"
+  }
+}

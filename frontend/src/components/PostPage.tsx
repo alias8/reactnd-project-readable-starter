@@ -4,13 +4,12 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { connect, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/top';
 import '../styles/App.scss';
-import TopSection from './TopSection';
+import TemplateCollection from './TemplateCollection';
 import * as API from '../api/api';
 import { NavLink } from 'react-router-dom';
 import { Template } from './Template';
 
 interface IState {
-    comments: IComment[];
     sortMethod: string;
 }
 
@@ -39,18 +38,8 @@ export class PostPage extends React.Component<IProps, IState> {
         this.VOTE_SCORE = 'VOTE_SCORE';
         this.TIME_STAMP = 'TIME_STAMP';
         this.state = {
-            comments: [],
             sortMethod: this.VOTE_SCORE
         };
-    }
-
-    componentDidMount() {
-        API.getCommentsForPost(this.props.originalParentPost[0].id)
-            .then((result) => {
-                this.setState({
-                    comments: result
-                });
-            });
     }
 
     formLinksFromCategories() {
@@ -89,13 +78,14 @@ export class PostPage extends React.Component<IProps, IState> {
     render() {
         return (
             <div>
-                <TopSection
+                <TemplateCollection
                     pageType={PageType.POST}
-                    posts={this.props.originalParentPost}
+                    itemsList={this.props.originalParentPost}
                 />
-                <TopSection
+                <TemplateCollection
                     pageType={PageType.COMMENT}
-                    posts={this.props.originalParentPost}
+                    parentPostID={this.props.originalParentPost[0].id}
+                    itemsList={[]}
                 />
             </div>
         );

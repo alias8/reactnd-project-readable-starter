@@ -8,7 +8,6 @@ import { eventActions, IEvent, Template } from './Template';
 import * as API from '../api/api';
 import {
     changeEditedID,
-    changeEditedTitle,
     deletePostAction,
     editOnePost, updateCategoriesAction,
     updatePostsAction,
@@ -17,6 +16,7 @@ import {
 
 interface IState {
     sortMethod: string;
+    comments: IComment[];
 }
 
 interface IMappedProps {
@@ -26,13 +26,13 @@ interface IMappedProps {
 
 interface IOwnProps {
     pageType: PageType;
-    posts: IPost[];
     itemsList: IPost[] | IComment[];
+    parentPostID?: string;
 }
 
 type IProps = IOwnProps & IMappedProps & DispatchProp<{}>;
 
-class TopSection extends Component<IProps, IState> {
+class TemplateCollection extends Component<IProps, IState> {
     private TIME_STAMP: string;
     private VOTE_SCORE: string;
 
@@ -41,7 +41,8 @@ class TopSection extends Component<IProps, IState> {
         this.VOTE_SCORE = 'VOTE_SCORE';
         this.TIME_STAMP = 'TIME_STAMP';
         this.state = {
-            sortMethod: this.VOTE_SCORE
+            sortMethod: this.VOTE_SCORE,
+            comments: []
         };
     }
 
@@ -54,6 +55,14 @@ class TopSection extends Component<IProps, IState> {
             .then(result => {
                 this.props.dispatch(updateCategoriesAction(result));
             });
+        if (this.props.pageType === PageType.COMMENT) {
+            API.getCommentsForPost(this.props.parentPostID)
+                .then((result) => {
+                    this.setState({
+                        comments: result
+                    })
+                })
+        }
     }
 
     formLinksFromCategories() {
@@ -109,13 +118,25 @@ class TopSection extends Component<IProps, IState> {
                 break;
             case eventActions.CLEAR_EDIT_ID:
                 this.props.dispatch(changeEditedID(''));
-                API.editDetailsOfExistingPost(event.ID, event.title, event.body)
-                    .then((result: IPost) => {
-                        this.props.dispatch(editOnePost(result));
-                    });
-                break;
-            case eventActions.CHANGE_EDITED_TITLE:
-                this.props.dispatch(changeEditedTitle(event.title));
+                if (event.type === PageType.POST) {
+                    API.editDetailsOfExistingPost(event.ID, event.title, event.body)
+                        .then((result: IPost) => {
+                            this.props.dispatch(editOnePost(result));
+                        });
+                } else if (event.type === PageType.COMMENT) {
+                    API.editDetailsOfExistingComment(event.ID, event.body)
+                        .then((result: IComment) => {
+                            const filteredComments = this.state.comments
+                                .filter((comment) => comment.id !== result.id);
+                            const refreshedArray = {
+                                ...filteredComments,
+                                result
+                            };
+                            this.setState({
+                                comments: refreshedArray
+                            })
+                        });
+                }
                 break;
             case eventActions.DELETE_POST:
                 API.deletePost(event.ID)
@@ -128,71 +149,75 @@ class TopSection extends Component<IProps, IState> {
     }
 
     isComment(obj: IComment[] | IPost[]): obj is IComment[] {
-        const objTest = obj as IComment[];
-        return objTest[0].parentDeleted !== undefined;
+        return this.props.pageType === PageType.COMMENT;
+        // const objTest = obj as IComment[];
+        // return objTest[0].parentDeleted !== undefined;
     }
 
     renderList() {
-        if (this.isComment(this.props.itemsList)) {
-            return this.props.itemsList
-                .sort((a, b) =>
-                    this.state.sortMethod === this.VOTE_SCORE ?
-                        b.voteScore - a.voteScore :
-                        b.timestamp - a.timestamp)
-                .map((comment, index) => {
-                    const beingEdited = this.props.beingEditedID === comment.id;
-                    return (
-                        <Template
-                            ID={comment.id}
-                            category={comment.category}
-                            title={comment.title}
-                            body={comment.body}
-                            timestamp={comment.timestamp}
-                            author={comment.author}
-                            type={this.props.pageType}
-                            beingEdited={beingEdited}
-                            voteScore={comment.voteScore}
-                            onSubmit={this.newOnSubmit}
-                            commentCount={comment.commentCount}
-                            key={index}
-                        />
-                    );
-                });
+        if (this.props.itemsList.length > 0) {
+            if (this.isComment(this.props.itemsList)) {
+                return this.props.itemsList
+                    .sort((a, b) =>
+                        this.state.sortMethod === this.VOTE_SCORE ?
+                            b.voteScore - a.voteScore :
+                            b.timestamp - a.timestamp)
+                    .map((comment, index) => {
+                        const beingEdited = this.props.beingEditedID === comment.id;
+                        return (
+                            <Template
+                                ID={comment.id}
+                                body={comment.body}
+                                timestamp={comment.timestamp}
+                                author={comment.author}
+                                type={this.props.pageType}
+                                beingEdited={beingEdited}
+                                voteScore={comment.voteScore}
+                                onSubmit={this.newOnSubmit}
+                                key={index}
+                            />
+                        );
+                    });
+            } else {
+                return this.props.itemsList
+                    .sort((a, b) =>
+                        this.state.sortMethod === this.VOTE_SCORE ?
+                            b.voteScore - a.voteScore :
+                            b.timestamp - a.timestamp)
+                    .map((post, index) => {
+                        const beingEdited = this.props.beingEditedID === post.id;
+                        return (
+                            <Template
+                                ID={post.id}
+                                category={post.category}
+                                title={post.title}
+                                body={post.body}
+                                timestamp={post.timestamp}
+                                author={post.author}
+                                type={this.props.pageType}
+                                beingEdited={beingEdited}
+                                voteScore={post.voteScore}
+                                onSubmit={this.newOnSubmit}
+                                commentCount={post.commentCount}
+                                key={index}
+                            />
+                        );
+                    });
+            }
         } else {
-            return this.props.itemsList
-                .sort((a, b) =>
-                    this.state.sortMethod === this.VOTE_SCORE ?
-                        b.voteScore - a.voteScore :
-                        b.timestamp - a.timestamp)
-                .map((post, index) => {
-                    const beingEdited = this.props.beingEditedID === post.id;
-                    return (
-                        <Template
-                            ID={post.id}
-                            category={post.category}
-                            title={post.title}
-                            body={post.body}
-                            timestamp={post.timestamp}
-                            author={post.author}
-                            type={this.props.pageType}
-                            beingEdited={beingEdited}
-                            voteScore={post.voteScore}
-                            onSubmit={this.newOnSubmit}
-                            commentCount={post.commentCount}
-                            key={index}
-                        />
-                    );
-                });
+            return [];
         }
     }
 
     render() {
         return (
             <div>
+                {this.props.pageType !== PageType.COMMENT &&
                 <div className={'top-navlink-container'}>
                     {this.formLinksFromCategories()}
                 </div>
-                {this.props.pageType === PageType.LISTED_POST &&
+                }
+                {this.props.pageType !== PageType.POST &&
                 <div className={'sort-container'}>
                     <div>Sort:</div>
                     <select value={this.state.sortMethod} onChange={this.handleChange}>
@@ -206,11 +231,13 @@ class TopSection extends Component<IProps, IState> {
                     <div className={'post-list'}>
                         {this.renderList()}
                     </div>
+                    {this.props.pageType !== PageType.COMMENT &&
                     <div className={'add-new-post'}>
                         <Link to={`/new`}>
                             Submit new post
                         </Link>
                     </div>
+                    }
                 </div>
 
             </div>
@@ -218,11 +245,9 @@ class TopSection extends Component<IProps, IState> {
     }
 }
 
-const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => {
-    return {
-        categories: state.categories.categories,
-        beingEditedID: state.beingEdited.beingEditedID,
-    };
-};
+const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
+    categories: state.categories.categories,
+    beingEditedID: state.beingEdited.beingEditedID,
+});
 
-export default connect(mapStateToProps)(TopSection);
+export default connect(mapStateToProps)(TemplateCollection);

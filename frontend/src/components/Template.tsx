@@ -2,17 +2,16 @@ import * as React from 'react';
 import Textarea from 'react-textarea-autosize';
 import * as moment from 'moment';
 import { PageType } from '../types/types';
-import * as API from '../api/api';
-import { changeEditedID, changeEditedTitle, voteOnPostAction } from '../actions/actions';
 import { Link } from 'react-router-dom';
 
 interface IState {
     editedTitle: string;
+    editedBody: string;
 }
 
 interface IOwnProps {
     ID: string;
-    title: string;
+    title?: string;
     body: string;
     beingEdited: boolean;
     timestamp: number;
@@ -20,8 +19,8 @@ interface IOwnProps {
     type: PageType;
     voteScore: number;
     onSubmit: (event: IEvent) => void;
-    category: string;
-    commentCount: number;
+    category?: string;
+    commentCount?: number;
 }
 
 export interface IEvent extends IOwnProps {
@@ -34,7 +33,8 @@ export enum eventActions {
     CHANGE_EDIT_ID = 'CHANGE_EDIT_ID',
     CHANGE_EDITED_TITLE = 'CHANGE_EDITED_TITLE',
     CLEAR_EDIT_ID = 'CLEAR_EDIT_ID',
-    DELETE_POST = 'DELETE_POST'
+    DELETE_POST = 'DELETE_POST',
+    CHANGE_EDITED_BODY = 'CHANGE_EDITED_BODY'
 }
 
 type IProps = IOwnProps;
@@ -43,7 +43,8 @@ export class Template extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            editedTitle: this.props.title
+            editedTitle: this.props.title,
+            editedBody: this.props.body
         };
     }
 
@@ -51,6 +52,7 @@ export class Template extends React.Component<IProps, IState> {
         const myEvent = {
             ...this.props,
             title: this.state.editedTitle,
+            body: this.state.editedBody,
             action: event.target.dataset.eventAction
         };
         this.props.onSubmit(myEvent);
@@ -61,6 +63,11 @@ export class Template extends React.Component<IProps, IState> {
             case eventActions.CHANGE_EDITED_TITLE:
                 this.setState({
                     editedTitle: event.target.value
+                });
+                break;
+            case eventActions.CHANGE_EDITED_BODY:
+                this.setState({
+                    editedBody: event.target.value
                 });
                 break;
             default:
@@ -116,8 +123,9 @@ export class Template extends React.Component<IProps, IState> {
                         {title}
                         {this.props.type !== PageType.LISTED_POST &&
                         <Textarea
-                            data-event-action="body"
-                            value={this.props.body}
+                            data-event-action={eventActions.CHANGE_EDITED_BODY}
+                            onChange={this.handleChange}
+                            value={this.state.editedBody}
                             readOnly={!this.props.beingEdited}
                         />
                         }

@@ -45,12 +45,6 @@ export function changeEditedID(id: string) {
     };
 }
 
-export function changeEditedTitle(title: string) {
-    return {
-        type: CHANGE_EDITED_TITLE,
-        editedTitle: title
-    };
-}
 
 export function editOnePost(post: IPost) {
     return {
