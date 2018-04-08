@@ -61,11 +61,19 @@ class TemplateCollection extends Component<IProps, IState> {
             .then(result => {
                 this.props.dispatch(updateCategoriesAction(result));
             });
-        if (this.props.pageType === PageType.COMMENT) {
-            API.getCommentsForPost(this.props.parentPostID)
+    }
+
+    componentWillReceiveProps(nextProps: IProps) {
+        if (this.props.pageType === PageType.COMMENT && nextProps.parentPostID !== '') {
+            API.getCommentsForPost(nextProps.parentPostID)
                 .then((result) => {
                     this.setState({
                         comments: result
+                    });
+                })
+                .catch((error) => {
+                    this.setState({
+                        comments: []
                     });
                 });
         }
@@ -241,25 +249,27 @@ class TemplateCollection extends Component<IProps, IState> {
                 }
                 <hr className={'thick-hr'}/>
                 {this.props.pageType === PageType.COMMENT &&
-                <div>
-                    <div>Add a comment:</div>
-                    <Textarea
-                        placeholder={'start typing your comment!'}
-                        data-event-action={eventActions.CHANGE_NEW_COMMENT_BODY}
-                        value={this.state.newCommentBody}
-                        onChange={this.updateNewComment}
-                        required={true}
-                        className={'input-field'}
-                    />
-                    <Textarea
-                        placeholder={'comment author\'s name'}
-                        data-event-action={eventActions.CHANGE_NEW_COMMENT_AUTHOR}
-                        value={this.state.newCommentAuthor}
-                        onChange={this.updateNewComment}
-                        required={true}
-                        className={'input-field'}
-                    />
-                    <button onClick={this.submitNewComment}>Submit comment</button>
+                <div className={'add-new-comment-container'}>
+                    <div>
+                        <div>Add a comment:</div>
+                        <Textarea
+                            placeholder={'start typing your comment!'}
+                            data-event-action={eventActions.CHANGE_NEW_COMMENT_BODY}
+                            value={this.state.newCommentBody}
+                            onChange={this.updateNewComment}
+                            required={true}
+                            className={'input-field'}
+                        />
+                        <Textarea
+                            placeholder={'comment author\'s name'}
+                            data-event-action={eventActions.CHANGE_NEW_COMMENT_AUTHOR}
+                            value={this.state.newCommentAuthor}
+                            onChange={this.updateNewComment}
+                            required={true}
+                            className={'input-field'}
+                        />
+                        <button onClick={this.submitNewComment}>Submit comment</button>
+                    </div>
                 </div>
                 }
 

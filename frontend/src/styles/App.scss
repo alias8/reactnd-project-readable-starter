@@ -97,8 +97,14 @@ textarea {
   position: relative;
 }
 
+.add-new-comment-container {
+  display: flex;
+  margin-left: 80px;
+  margin-bottom: 30px;
+}
+
 .left-buffer {
-  width: 90px;
+  width: 80px;
   height: 40px;
 }
 
@@ -244,6 +250,10 @@ $vertical-separator-height: 30px;
     width: 100% - $post-list-width;
     text-align: center;
   }
+}
+
+.new-post-container {
+  margin-left: 80px;
 }
 
 

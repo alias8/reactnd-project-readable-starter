@@ -110,38 +110,35 @@ class NewPost extends React.Component<IProps, IState> {
                     <TopNav/>
                     <div className={'top-buffer'}/>
                     <hr className={'thick-hr'}/>
-                    <div className={'main-flex-container'}>
-                        <div className={'left-buffer'}/>
-                        <div className={'post-list'}>
-                            Submit a new post:
-                            <form onSubmit={this.handleSubmit}>
-                                <input
-                                    placeholder={'start typing your post\'s title'}
-                                    name="title"
-                                    value={this.state.title}
-                                    onChange={this.handleTitleChange}
-                                    required={true}
-                                    className={'input-field'}
-                                />
-                                <textarea
-                                    placeholder={'start typing the body of your new post'}
-                                    name="text"
-                                    onChange={this.handleTextChange}
-                                    required={true}
-                                    className={'input-field'}
-                                />
-                                <input
-                                    placeholder={'post author name'}
-                                    name="author"
-                                    onChange={this.handleAuthorChange}
-                                    required={true}
-                                    className={'input-field'}
-                                />
-                                <input type="submit" value="Submit"/>
-                            </form>
-                            <div>Choose a category to post to:</div>
-                            {categories}
-                        </div>
+                    <div className={'new-post-container'}>
+                        Submit a new post:
+                        <form onSubmit={this.handleSubmit}>
+                            <input
+                                placeholder={'start typing your post\'s title'}
+                                name="title"
+                                value={this.state.title}
+                                onChange={this.handleTitleChange}
+                                required={true}
+                                className={'input-field'}
+                            />
+                            <textarea
+                                placeholder={'start typing the body of your new post'}
+                                name="text"
+                                onChange={this.handleTextChange}
+                                required={true}
+                                className={'input-field'}
+                            />
+                            <input
+                                placeholder={'post author name'}
+                                name="author"
+                                onChange={this.handleAuthorChange}
+                                required={true}
+                                className={'input-field'}
+                            />
+                            <input type="submit" value="Submit"/>
+                        </form>
+                        <div>Choose a category to post to:</div>
+                        {categories}
                     </div>
                 </div>
             );

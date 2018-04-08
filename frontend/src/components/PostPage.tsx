@@ -11,6 +11,7 @@ import { Template } from './Template';
 
 interface IState {
     sortMethod: string;
+    originalParentPostId: string;
 }
 
 interface IMappedProps {
@@ -38,8 +39,15 @@ export class PostPage extends React.Component<IProps, IState> {
         this.VOTE_SCORE = 'VOTE_SCORE';
         this.TIME_STAMP = 'TIME_STAMP';
         this.state = {
-            sortMethod: this.VOTE_SCORE
+            sortMethod: this.VOTE_SCORE,
+            originalParentPostId: ''
         };
+    }
+
+    componentWillReceiveProps(nextProps: IProps) {
+        this.setState({
+            originalParentPostId: nextProps.originalParentPost[0].id
+        });
     }
 
     render() {
@@ -51,7 +59,7 @@ export class PostPage extends React.Component<IProps, IState> {
                 />
                 <TemplateCollection
                     pageType={PageType.COMMENT}
-                    parentPostID={this.props.originalParentPost[0].id}
+                    parentPostID={this.state.originalParentPostId}
                     itemsList={[]}
                 />
             </div>

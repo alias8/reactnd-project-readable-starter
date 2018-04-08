@@ -16,7 +16,9 @@ export function fetchCategories(): Promise<ICategory[]> {
     })
         .then(result => result.json())
         .then(data => data.categories)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 export function fetchPosts(): Promise<IPost[]> {
@@ -26,7 +28,9 @@ export function fetchPosts(): Promise<IPost[]> {
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 export function getCommentsForPost(id: string): Promise<IComment[]> {
@@ -36,7 +40,9 @@ export function getCommentsForPost(id: string): Promise<IComment[]> {
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 export function postCommentToPost(author: string, body: string, parentId: string): Promise<IComment> {
@@ -53,7 +59,9 @@ export function postCommentToPost(author: string, body: string, parentId: string
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 export function addNewPost(title: string, body: string, author: string, category: string): Promise<IPost> {
@@ -71,7 +79,9 @@ export function addNewPost(title: string, body: string, author: string, category
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 export function getPostsForOneCategory(category: string): Promise<IPost[]> {
@@ -81,7 +91,9 @@ export function getPostsForOneCategory(category: string): Promise<IPost[]> {
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 export function getDetailsForOnePost(id: string): Promise<IPost> {
@@ -91,7 +103,9 @@ export function getDetailsForOnePost(id: string): Promise<IPost> {
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 //
@@ -111,7 +125,9 @@ export function voteOnPost(id: string, vote: string): Promise<IPost> {
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 //
 
@@ -126,7 +142,9 @@ export function editDetailsOfExistingPost(id: string, title: string, body: strin
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 export function deletePost(id: string): Promise<IPost> {
@@ -136,7 +154,9 @@ export function deletePost(id: string): Promise<IPost> {
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 //
@@ -157,7 +177,9 @@ export function voteOnComment(id: string, vote: string): Promise<IComment> {
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 export function editDetailsOfExistingComment(id: string, body: string): Promise<IComment> {
@@ -171,7 +193,9 @@ export function editDetailsOfExistingComment(id: string, body: string): Promise<
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
 
 export function deleteComment(id: string): Promise<IComment> {
@@ -181,5 +205,7 @@ export function deleteComment(id: string): Promise<IComment> {
     })
         .then(result => result.json())
         .then(data => data)
-        .catch(error => error);
+        .catch(error => {
+            throw error;
+        });
 }
