@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { IPost, PageType } from '../types/types';
-import { RootState } from '../reducers/top';
+import { RootState } from '../reducers/TopReducer';
 import { Redirect, RouteComponentProps } from 'react-router';
 import '../styles/App.scss';
 import TemplateCollection from './TemplateCollection';

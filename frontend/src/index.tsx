@@ -9,10 +9,10 @@ import {
     BrowserRouter as Router,
     Route } from 'react-router-dom';
 import { Switch } from 'react-router';
-import { NewPost } from './components/NewPost';
+import NewPost from './components/NewPost';
 import { NotFoundPage } from './components/NotFoundPage';
 import Category from './components/Category';
-import PostPage from "./components/PostPage";
+import PostPage from './components/PostPage';
 
 ReactDOM.render(
     <Provider store={store}>
@@ -21,8 +21,8 @@ ReactDOM.render(
                 <Route exact={true} path={'/new'} component={NewPost}/>
                 <Route exact={true} path={'/'} component={App}/>
                 <Route exact={true} path={'/404'} component={NotFoundPage}/>
-                <Route exact={true} path={'/:category/posts'} component={Category}/>
-                <Route exact={true} path={'/:category/posts/:id'} component={PostPage}/>
+                <Route exact={true} path={'/:category/'} component={Category}/>
+                <Route exact={true} path={'/:category/:id'} component={PostPage}/>
             </Switch>
         </Router>
     </Provider>,

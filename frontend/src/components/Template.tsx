@@ -34,7 +34,9 @@ export enum eventActions {
     CHANGE_EDITED_TITLE = 'CHANGE_EDITED_TITLE',
     CLEAR_EDIT_ID = 'CLEAR_EDIT_ID',
     DELETE_POST = 'DELETE_POST',
-    CHANGE_EDITED_BODY = 'CHANGE_EDITED_BODY'
+    CHANGE_EDITED_BODY = 'CHANGE_EDITED_BODY',
+    CHANGE_NEW_COMMENT_BODY = 'CHANGE_NEW_COMMENT_BODY',
+    CHANGE_NEW_COMMENT_AUTHOR = 'CHANGE_NEW_COMMENT_AUTHOR'
 }
 
 type IProps = IOwnProps;
@@ -80,7 +82,7 @@ export class Template extends React.Component<IProps, IState> {
             textAreaClassNames.push('no-blue-highlight-text-area');
         }
         const titleAsLink = (
-            <Link to={`${this.props.category}/posts/${this.props.ID}`}>
+            <Link to={`${this.props.category}/${this.props.ID}`}>
                 {this.state.editedTitle}
             </Link>
         );
@@ -134,12 +136,14 @@ export class Template extends React.Component<IProps, IState> {
                                 className={'first-line'}
                             >submitted {moment(this.props.timestamp).fromNow()} by {this.props.author}
                                 {this.props.type === PageType.LISTED_POST &&
-                                <span> to <Link to={`${this.props.category}/posts`}>{this.props.category}</Link>
+                                <span> to <Link to={`${this.props.category}`}>{this.props.category}</Link>
                             </span>
                                 }
                             </div>
                             <div className={'second-line'}>
+                                {this.props.type !== PageType.COMMENT &&
                                 <span>{this.props.commentCount} comments </span>
+                                }
                                 <button
                                     className={'edit-submit-delete-button'}
                                     data-event-action={this.props.beingEdited ?

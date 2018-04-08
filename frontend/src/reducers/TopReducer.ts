@@ -1,8 +1,8 @@
-import { PostState } from './Posts';
+import { PostState } from './PostsReducer';
 import { combineReducers, Reducer } from 'redux';
-import posts from './Posts';
-import categories, { CategoriesState } from './Categories';
-import editing, { EditState } from './Editing';
+import posts from './PostsReducer';
+import categories, { CategoriesState } from './CategoriesReducer';
+import editing, { EditState } from './EditingReducer';
 
 export type RootState = {
     posts: PostState,

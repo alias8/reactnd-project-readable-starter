@@ -2,8 +2,11 @@ import * as React from 'react';
 import * as API from '../api/api';
 import { ChangeEvent } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
-import { ICategory, IComment } from '../types/types';
+import { ICategory, IComment, IPost, PageType } from '../types/types';
 import '../styles/App.scss';
+import { addOnePostAction, updatePostsAction } from '../actions/actions';
+import { connect, DispatchProp } from 'react-redux';
+import TopNav from './TopNav';
 
 interface IState {
     title: string;
@@ -22,9 +25,9 @@ interface IOwnProps {
 
 }
 
-type IProps = IOwnProps & IMappedProps & RouteComponentProps<{}>;
+type IProps = IOwnProps & IMappedProps & RouteComponentProps<{}> & DispatchProp<{}>;
 
-export class NewPost extends React.Component<IProps, IState> {
+class NewPost extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -49,12 +52,15 @@ export class NewPost extends React.Component<IProps, IState> {
     handleSubmit = (event) => {
         event.preventDefault();
         event.stopPropagation();
-        API.addNewPost(this.state.title, this.state.text, this.state.author, this.state.chosenCategory)
-            .then((result: IComment) => {
-                this.setState({
-                    postSubmitted: true
+        if (this.state.chosenCategory !== '') {
+            API.addNewPost(this.state.title, this.state.text, this.state.author, this.state.chosenCategory)
+                .then((result: IPost) => {
+                    this.props.dispatch(addOnePostAction(result));
+                    this.setState({
+                        postSubmitted: true
+                    });
                 });
-            });
+        }
     }
 
     handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -101,36 +107,46 @@ export class NewPost extends React.Component<IProps, IState> {
         } else {
             return (
                 <div>
-                    Submit a new post:
-                    <form onSubmit={this.handleSubmit}>
-                        <label className="add-new-post-input">
-                            Title:
-                            <input
-                                name="title"
-                                value={this.state.title}
-                                onChange={this.handleTitleChange}
-                            />
-                        </label>
-                        <label className="add-new-post-input">
-                            Text:
-                            <textarea
-                                name="text"
-                                onChange={this.handleTextChange}
-                            />
-                        </label>
-                        <label className="add-new-post-input">
-                            Author:
-                            <input
-                                name="author"
-                                onChange={this.handleAuthorChange}
-                            />
-                        </label>
-                        <input type="submit" value="Submit"/>
-                    </form>
-                    <div>Choose a category to post to:</div>
-                    {categories}
+                    <TopNav/>
+                    <div className={'top-buffer'}/>
+                    <hr className={'thick-hr'}/>
+                    <div className={'main-flex-container'}>
+                        <div className={'left-buffer'}/>
+                        <div className={'post-list'}>
+                            Submit a new post:
+                            <form onSubmit={this.handleSubmit}>
+                                <input
+                                    placeholder={'start typing your post\'s title'}
+                                    name="title"
+                                    value={this.state.title}
+                                    onChange={this.handleTitleChange}
+                                    required={true}
+                                    className={'input-field'}
+                                />
+                                <textarea
+                                    placeholder={'start typing the body of your new post'}
+                                    name="text"
+                                    onChange={this.handleTextChange}
+                                    required={true}
+                                    className={'input-field'}
+                                />
+                                <input
+                                    placeholder={'post author name'}
+                                    name="author"
+                                    onChange={this.handleAuthorChange}
+                                    required={true}
+                                    className={'input-field'}
+                                />
+                                <input type="submit" value="Submit"/>
+                            </form>
+                            <div>Choose a category to post to:</div>
+                            {categories}
+                        </div>
+                    </div>
                 </div>
             );
         }
     }
 }
+
+export default connect()(NewPost);

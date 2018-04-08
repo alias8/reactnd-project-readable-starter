@@ -97,6 +97,20 @@ textarea {
   position: relative;
 }
 
+.left-buffer {
+  width: 90px;
+  height: 40px;
+}
+
+.top-buffer {
+  width: auto;
+  height: 47px;
+}
+
+.input-field {
+  display: block;
+}
+
 .not-post-vote-score {
   display: inline-block;
   width: 40%;

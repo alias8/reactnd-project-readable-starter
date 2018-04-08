@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
-import { RootState } from '../reducers/top';
+import { RootState } from '../reducers/TopReducer';
 import { IPost, PageType } from '../types/types';
 import '../styles/App.scss';
 import TemplateCollection from './TemplateCollection';

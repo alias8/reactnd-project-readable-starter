@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ICategory, IComment, IPost, PageType } from '../types/types';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { connect, MapStateToProps } from 'react-redux';
-import { RootState } from '../reducers/top';
+import { RootState } from '../reducers/TopReducer';
 import '../styles/App.scss';
 import TemplateCollection from './TemplateCollection';
 import * as API from '../api/api';
@@ -40,39 +40,6 @@ export class PostPage extends React.Component<IProps, IState> {
         this.state = {
             sortMethod: this.VOTE_SCORE
         };
-    }
-
-    formLinksFromCategories() {
-        let categoryLinks: any = [];
-        categoryLinks.push(
-            <NavLink
-                className={'top-navlink'}
-                to={`/`}
-                exact={true}
-                key={'all'}
-                activeStyle={{
-                    fontWeight: 'bold',
-                    color: 'red'
-                }}
-            >{'All'.toUpperCase()}
-            </NavLink>
-        );
-
-        this.props.categories.forEach((category, index) => (
-            categoryLinks.push(
-                <NavLink
-                    className={'top-navlink'}
-                    to={`/${category.name}/posts`}
-                    key={category.name}
-                    activeStyle={{
-                        fontWeight: 'bold',
-                        color: 'red'
-                    }}
-                >{category.name.toUpperCase()}
-                </NavLink>
-            )
-        ));
-        return categoryLinks;
     }
 
     render() {

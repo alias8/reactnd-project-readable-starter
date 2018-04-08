@@ -1,4 +1,4 @@
-import { IPost } from '../types/types';
+import { ICategory, IPost } from '../types/types';
 
 export const UPDATE_POSTS = 'UPDATE_POSTS';
 export const DELETE_POST = 'DELETE_POST';
@@ -7,12 +7,20 @@ export const UPDATE_CATEGORIES = 'UPDATE_CATEGORIES';
 export const CHANGE_EDITED_ID = 'CHANGE_EDITED_ID';
 export const CHANGE_EDITED_TITLE = 'CHANGE_EDITED_TITLE';
 export const EDIT_ONE_POST = 'EDIT_ONE_POST';
+export const ADD_ONE_POST = 'ADD_ONE_POST';
 
 export function updatePostsAction(posts: IPost[]) {
     return {
         type: UPDATE_POSTS,
         posts: posts
 
+    };
+}
+
+export function addOnePostAction(post: IPost) {
+    return {
+        type: ADD_ONE_POST,
+        post: post
     };
 }
 
@@ -23,14 +31,14 @@ export function deletePostAction(post: IPost) {
     };
 }
 
-export function voteOnPostAction(post) {
+export function voteOnPostAction(post: IPost) {
     return {
         type: VOTE_ON_POST,
         post: post
     };
 }
 
-export function updateCategoriesAction(categories) {
+export function updateCategoriesAction(categories: ICategory[]) {
     return {
         type: UPDATE_CATEGORIES,
         categories: categories
@@ -44,7 +52,6 @@ export function changeEditedID(id: string) {
         editedID: id
     };
 }
-
 
 export function editOnePost(post: IPost) {
     return {

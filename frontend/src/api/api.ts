@@ -56,7 +56,7 @@ export function postCommentToPost(author: string, body: string, parentId: string
         .catch(error => error);
 }
 
-export function addNewPost(title: string, body: string, author: string, category: string): Promise<IComment> {
+export function addNewPost(title: string, body: string, author: string, category: string): Promise<IPost> {
     return fetch(`${api}/posts`, {
         method: 'POST',
         headers: header,
@@ -174,7 +174,7 @@ export function editDetailsOfExistingComment(id: string, body: string): Promise<
         .catch(error => error);
 }
 
-export function deleteComment(id: string): Promise<IPost> {
+export function deleteComment(id: string): Promise<IComment> {
     return fetch(`${api}/comments/${id}`, {
         method: 'DELETE',
         headers: header,

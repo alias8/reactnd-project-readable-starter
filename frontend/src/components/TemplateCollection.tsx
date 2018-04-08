@@ -3,7 +3,7 @@ import { ICategory, IComment, IPost, PageType } from '../types/types';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
-import { RootState } from '../reducers/top';
+import { RootState } from '../reducers/TopReducer';
 import { eventActions, IEvent, Template } from './Template';
 import * as API from '../api/api';
 import {
@@ -13,10 +13,14 @@ import {
     updatePostsAction,
     voteOnPostAction
 } from '../actions/actions';
+import TopNav from './TopNav';
+import Textarea from 'react-textarea-autosize';
 
 interface IState {
     sortMethod: string;
     comments: IComment[];
+    newCommentBody: string;
+    newCommentAuthor: string;
 }
 
 interface IMappedProps {
@@ -42,7 +46,9 @@ class TemplateCollection extends Component<IProps, IState> {
         this.TIME_STAMP = 'TIME_STAMP';
         this.state = {
             sortMethod: this.VOTE_SCORE,
-            comments: []
+            comments: [],
+            newCommentBody: '',
+            newCommentAuthor: ''
         };
     }
 
@@ -60,58 +66,37 @@ class TemplateCollection extends Component<IProps, IState> {
                 .then((result) => {
                     this.setState({
                         comments: result
-                    })
-                })
+                    });
+                });
         }
     }
 
-    formLinksFromCategories() {
-        let categoryLinks: any = [];
-        categoryLinks.push(
-            <NavLink
-                className={'top-navlink'}
-                to={`/`}
-                exact={true}
-                key={'all'}
-                activeStyle={{
-                    fontWeight: 'bold',
-                    color: 'red'
-                }}
-            >{'All'.toUpperCase()}
-            </NavLink>
-        );
-
-        this.props.categories.forEach((category, index) => (
-            categoryLinks.push(
-                <NavLink
-                    className={'top-navlink'}
-                    to={`/${category.name}/posts`}
-                    key={category.name}
-                    activeStyle={{
-                        fontWeight: 'bold',
-                        color: 'red'
-                    }}
-                >{category.name.toUpperCase()}
-                </NavLink>
-            )
-        ));
-        return categoryLinks;
-    }
-
-    handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+    updateSortMethod = (e: React.ChangeEvent<HTMLSelectElement>): void => {
         this.setState({
             sortMethod: e.currentTarget.value
         });
     }
 
-    newOnSubmit = (event: IEvent) => {
+    handleTemplateSubmit = (event: IEvent) => {
         switch (event.action) {
             case eventActions.UPVOTE:
             case eventActions.DOWNVOTE:
-                API.voteOnPost(event.ID, event.action)
-                    .then((result) => {
-                        this.props.dispatch(voteOnPostAction(result));
-                    });
+                if(event.type === PageType.COMMENT) {
+                    API.voteOnComment(event.ID, event.action)
+                        .then((result) => {
+                            const newCommentList = this.state.comments.filter((comment) => comment.id !== result.id);
+                            newCommentList.push(result);
+                            this.setState({
+                                comments: newCommentList
+                            });
+                        });
+                } else {
+                    API.voteOnPost(event.ID, event.action)
+                        .then((result) => {
+                            this.props.dispatch(voteOnPostAction(result));
+                        });
+                }
+
                 break;
             case eventActions.CHANGE_EDIT_ID:
                 this.props.dispatch(changeEditedID(event.ID));
@@ -126,23 +111,28 @@ class TemplateCollection extends Component<IProps, IState> {
                 } else if (event.type === PageType.COMMENT) {
                     API.editDetailsOfExistingComment(event.ID, event.body)
                         .then((result: IComment) => {
-                            const filteredComments = this.state.comments
-                                .filter((comment) => comment.id !== result.id);
-                            const refreshedArray = {
-                                ...filteredComments,
-                                result
-                            };
+                            const newCommentList = this.state.comments.filter((comment) => comment.id !== result.id);
+                            newCommentList.push(result);
                             this.setState({
-                                comments: refreshedArray
-                            })
+                                comments: newCommentList
+                            });
                         });
                 }
                 break;
             case eventActions.DELETE_POST:
-                API.deletePost(event.ID)
-                    .then((result: IPost) => {
-                        this.props.dispatch(deletePostAction(result));
-                    });
+                if (event.type === PageType.COMMENT) {
+                    API.deleteComment(event.ID)
+                        .then((result: IComment) => {
+                            this.setState({
+                                comments: this.state.comments.filter((comment) => comment.id !== result.id)
+                            });
+                        });
+                } else {
+                    API.deletePost(event.ID)
+                        .then((result: IPost) => {
+                            this.props.dispatch(deletePostAction(result));
+                        });
+                }
                 break;
             default:
         }
@@ -155,9 +145,8 @@ class TemplateCollection extends Component<IProps, IState> {
     }
 
     renderList() {
-        if (this.props.itemsList.length > 0) {
             if (this.isComment(this.props.itemsList)) {
-                return this.props.itemsList
+                return this.state.comments
                     .sort((a, b) =>
                         this.state.sortMethod === this.VOTE_SCORE ?
                             b.voteScore - a.voteScore :
@@ -173,7 +162,7 @@ class TemplateCollection extends Component<IProps, IState> {
                                 type={this.props.pageType}
                                 beingEdited={beingEdited}
                                 voteScore={comment.voteScore}
-                                onSubmit={this.newOnSubmit}
+                                onSubmit={this.handleTemplateSubmit}
                                 key={index}
                             />
                         );
@@ -197,15 +186,41 @@ class TemplateCollection extends Component<IProps, IState> {
                                 type={this.props.pageType}
                                 beingEdited={beingEdited}
                                 voteScore={post.voteScore}
-                                onSubmit={this.newOnSubmit}
+                                onSubmit={this.handleTemplateSubmit}
                                 commentCount={post.commentCount}
                                 key={index}
                             />
                         );
                     });
             }
-        } else {
-            return [];
+    }
+
+    updateNewComment =  (event: React.ChangeEvent<HTMLSelectElement>) => {
+        switch (event.target.dataset.eventAction) {
+            case eventActions.CHANGE_NEW_COMMENT_BODY:
+                this.setState({
+                    newCommentBody: event.currentTarget.value
+                });
+                break;
+            case eventActions.CHANGE_NEW_COMMENT_AUTHOR:
+                this.setState({
+                    newCommentAuthor: event.currentTarget.value
+                });
+                break;
+            default:
+        }
+    }
+
+    submitNewComment = () => {
+        if (this.state.newCommentBody !== '' && this.state.newCommentAuthor !== '') {
+            API.postCommentToPost(this.state.newCommentAuthor, this.state.newCommentBody, this.props.parentPostID)
+                .then((result: IComment) => {
+                    const newCommentList = this.state.comments.filter((comment) => comment.id !== result.id);
+                    newCommentList.push(result);
+                    this.setState({
+                        comments: newCommentList
+                    });
+                });
         }
     }
 
@@ -213,20 +228,41 @@ class TemplateCollection extends Component<IProps, IState> {
         return (
             <div>
                 {this.props.pageType !== PageType.COMMENT &&
-                <div className={'top-navlink-container'}>
-                    {this.formLinksFromCategories()}
-                </div>
+                <TopNav/>
                 }
                 {this.props.pageType !== PageType.POST &&
                 <div className={'sort-container'}>
                     <div>Sort:</div>
-                    <select value={this.state.sortMethod} onChange={this.handleChange}>
+                    <select value={this.state.sortMethod} onChange={this.updateSortMethod}>
                         <option value={this.VOTE_SCORE}>Score (highest first)</option>
                         <option value={this.TIME_STAMP}>Time (newest first)</option>
                     </select>
                 </div>
                 }
                 <hr className={'thick-hr'}/>
+                {this.props.pageType === PageType.COMMENT &&
+                <div>
+                    <div>Add a comment:</div>
+                    <Textarea
+                        placeholder={'start typing your comment!'}
+                        data-event-action={eventActions.CHANGE_NEW_COMMENT_BODY}
+                        value={this.state.newCommentBody}
+                        onChange={this.updateNewComment}
+                        required={true}
+                        className={'input-field'}
+                    />
+                    <Textarea
+                        placeholder={'comment author\'s name'}
+                        data-event-action={eventActions.CHANGE_NEW_COMMENT_AUTHOR}
+                        value={this.state.newCommentAuthor}
+                        onChange={this.updateNewComment}
+                        required={true}
+                        className={'input-field'}
+                    />
+                    <button onClick={this.submitNewComment}>Submit comment</button>
+                </div>
+                }
+
                 <div className={'main-flex-container'}>
                     <div className={'post-list'}>
                         {this.renderList()}
