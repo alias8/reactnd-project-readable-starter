@@ -45,9 +45,11 @@ export class PostPage extends React.Component<IProps, IState> {
     }
 
     componentWillReceiveProps(nextProps: IProps) {
-        this.setState({
-            originalParentPostId: nextProps.originalParentPost[0].id
-        });
+        if(nextProps.originalParentPost.length > 0) {
+            this.setState({
+                originalParentPostId: nextProps.originalParentPost[0].id
+            });
+        }
     }
 
     render() {

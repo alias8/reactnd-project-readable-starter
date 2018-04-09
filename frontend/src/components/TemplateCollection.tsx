@@ -229,6 +229,10 @@ class TemplateCollection extends Component<IProps, IState> {
                         comments: newCommentList
                     });
                 });
+            API.fetchPosts()
+                .then(result => {
+                    this.props.dispatch(updatePostsAction(result));
+                });
         }
     }
 

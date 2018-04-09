@@ -60,6 +60,13 @@ export class Template extends React.Component<IProps, IState> {
         this.props.onSubmit(myEvent);
     }
 
+    componentWillReceiveProps(nextProps: IProps) {
+        this.setState({
+            editedTitle: nextProps.title,
+            editedBody: nextProps.body
+        })
+    }
+
     handleChange = (event) => {
         switch (event.target.dataset.eventAction) {
             case eventActions.CHANGE_EDITED_TITLE:

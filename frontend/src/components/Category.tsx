@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Component } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { Redirect, RouteComponentProps, withRouter } from 'react-router';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
 import { IPost, PageType } from '../types/types';
@@ -13,6 +13,7 @@ interface IState {
 
 interface IMappedProps {
     posts: IPost[];
+    wrongRoute: boolean;
 }
 
 interface IOwnProps {
@@ -27,7 +28,9 @@ type IProps = IOwnProps & IMappedProps & DispatchProp<{}> & RouteComponentProps<
 
 class Category extends Component<IProps, IState> {
     render() {
-        return (
+        return this.props.wrongRoute ? (
+            <Redirect to={'/404'}/>
+        ) : (
             <TemplateCollection
                 pageType={PageType.LISTED_POST}
                 itemsList={this.props.posts}
@@ -36,10 +39,13 @@ class Category extends Component<IProps, IState> {
     }
 }
 
-const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
-    posts: state.posts.posts.filter(post => {
-        return post.category === props.match.params.category;
-    }),
-});
+const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => {
+    const filteredPosts = state.posts.posts.filter(post => post.category === props.match.params.category);
+    const wrongRoute = state.posts.posts.length > 0 && filteredPosts.length === 0;
+    return {
+        posts: filteredPosts,
+        wrongRoute: wrongRoute
+    }
+};
 
 export default withRouter<any>(connect(mapStateToProps)(Category));
