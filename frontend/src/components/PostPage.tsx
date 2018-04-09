@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ICategory, IComment, IPost, PageType } from '../types/types';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { Redirect, RouteComponentProps, withRouter } from 'react-router';
 import { connect, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
 import '../styles/App.scss';
@@ -17,6 +17,7 @@ interface IState {
 interface IMappedProps {
     originalParentPost: IPost[];
     categories: ICategory[];
+    wrongRoute: boolean;
 }
 
 interface IOwnProps {
@@ -45,7 +46,7 @@ export class PostPage extends React.Component<IProps, IState> {
     }
 
     componentWillReceiveProps(nextProps: IProps) {
-        if(nextProps.originalParentPost.length > 0) {
+        if (nextProps.originalParentPost.length > 0) {
             this.setState({
                 originalParentPostId: nextProps.originalParentPost[0].id
             });
@@ -53,7 +54,9 @@ export class PostPage extends React.Component<IProps, IState> {
     }
 
     render() {
-        return (
+        return this.props.wrongRoute ? (
+            <Redirect to={'/404'}/>
+        ) : (
             <div>
                 <TemplateCollection
                     pageType={PageType.POST}
@@ -69,11 +72,14 @@ export class PostPage extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
-    originalParentPost: state.posts.posts.filter(post => {
-        return post.id === props.match.params.id;
-    }),
-    categories: state.categories.categories,
-});
+const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => {
+    const filteredPosts = state.posts.posts.filter(post => post.id === props.match.params.id);
+    const wrongRoute = state.posts.posts.length > 0 && filteredPosts.length === 0;
+    return {
+        originalParentPost: filteredPosts,
+        categories: state.categories.categories,
+        wrongRoute: wrongRoute
+    }
+};
 
 export default withRouter<any>(connect(mapStateToProps)(PostPage));
