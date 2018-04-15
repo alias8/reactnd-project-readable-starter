@@ -1,13 +1,10 @@
 import * as React from 'react';
-import { ICategory, IComment, IPost, PageType } from '../types/types';
+import { ICategory, IPost, PageType } from '../types/types';
 import { Redirect, RouteComponentProps, withRouter } from 'react-router';
 import { connect, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
 import '../styles/App.scss';
 import TemplateCollection from './TemplateCollection';
-import * as API from '../api/api';
-import { NavLink } from 'react-router-dom';
-import { Template } from './Template';
 
 interface IState {
     sortMethod: string;

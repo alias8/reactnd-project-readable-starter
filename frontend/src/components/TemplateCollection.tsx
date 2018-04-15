@@ -2,19 +2,24 @@ import * as React from 'react';
 import { ICategory, IComment, IPost, PageType } from '../types/types';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { RootState } from '../reducers/TopReducer';
 import { eventActions, IEvent, Template } from './Template';
 import * as API from '../api/api';
-import {
-    changeEditedID,
-    deletePostAction,
-    editOnePost, updateCategoriesAction,
-    updatePostsAction,
-    voteOnPostAction
-} from '../actions/actions';
 import TopNav from './TopNav';
 import Textarea from 'react-textarea-autosize';
+import {
+    APIDeletePost,
+    APIEditDetailsOfExistingPost, APIFetchPosts,
+    APIVoteOnPost,
+    deletePostAction,
+    editOnePost,
+    updatePostsAction,
+    voteOnPostAction
+} from '../actions/postActions';
+import { APIFetchCategories, updateCategoriesAction } from '../actions/categoriesActions';
+import { changeEditedID } from '../actions/editingActions';
+import { APIDeleteComment } from '../actions/commentActions';
 
 interface IState {
     sortMethod: string;
@@ -53,14 +58,8 @@ class TemplateCollection extends Component<IProps, IState> {
     }
 
     componentDidMount() {
-        API.fetchPosts()
-            .then(result => {
-                this.props.dispatch(updatePostsAction(result));
-            });
-        API.fetchCategories()
-            .then(result => {
-                this.props.dispatch(updateCategoriesAction(result));
-            });
+        this.props.dispatch(APIFetchPosts());
+        this.props.dispatch(APIFetchCategories());
     }
 
     componentWillReceiveProps(nextProps: IProps) {
@@ -89,7 +88,7 @@ class TemplateCollection extends Component<IProps, IState> {
         switch (event.action) {
             case eventActions.UPVOTE:
             case eventActions.DOWNVOTE:
-                if(event.type === PageType.COMMENT) {
+                if (event.type === PageType.COMMENT) {
                     API.voteOnComment(event.ID, event.action)
                         .then((result) => {
                             const newCommentList = this.state.comments.filter((comment) => comment.id !== result.id);
@@ -99,12 +98,8 @@ class TemplateCollection extends Component<IProps, IState> {
                             });
                         });
                 } else {
-                    API.voteOnPost(event.ID, event.action)
-                        .then((result) => {
-                            this.props.dispatch(voteOnPostAction(result));
-                        });
+                    this.props.dispatch(APIVoteOnPost(event.ID, event.action));
                 }
-
                 break;
             case eventActions.CHANGE_EDIT_ID:
                 this.props.dispatch(changeEditedID(event.ID));
@@ -112,10 +107,7 @@ class TemplateCollection extends Component<IProps, IState> {
             case eventActions.CLEAR_EDIT_ID:
                 this.props.dispatch(changeEditedID(''));
                 if (event.type === PageType.POST) {
-                    API.editDetailsOfExistingPost(event.ID, event.title, event.body)
-                        .then((result: IPost) => {
-                            this.props.dispatch(editOnePost(result));
-                        });
+                    this.props.dispatch(APIEditDetailsOfExistingPost(event.ID, event.title, event.body));
                 } else if (event.type === PageType.COMMENT) {
                     API.editDetailsOfExistingComment(event.ID, event.body)
                         .then((result: IComment) => {
@@ -129,31 +121,20 @@ class TemplateCollection extends Component<IProps, IState> {
                 break;
             case eventActions.DELETE_POST:
                 if (event.type === PageType.COMMENT) {
-                    API.deleteComment(event.ID)
-                        .then((result: IComment) => {
-                            this.setState({
-                                comments: this.state.comments.filter((comment) => comment.id !== result.id)
-                            });
-                        });
+                    this.props.dispatch(APIDeleteComment(event.ID));
+                    this.setState({
+                        comments: this.state.comments.filter((comment) => comment.id !== event.ID)
+                    });
                 } else {
-                    API.deletePost(event.ID)
-                        .then((result: IPost) => {
-                            this.props.dispatch(deletePostAction(result));
-                        });
+                    this.props.dispatch(APIDeletePost(event.ID));
                 }
                 break;
             default:
         }
     }
 
-    isComment(obj: IComment[] | IPost[]): obj is IComment[] {
-        return this.props.pageType === PageType.COMMENT;
-        // const objTest = obj as IComment[];
-        // return objTest[0].parentDeleted !== undefined;
-    }
-
     renderList() {
-            if (this.isComment(this.props.itemsList)) {
+            if (this.props.pageType === PageType.COMMENT) {
                 return this.state.comments
                     .sort((a, b) =>
                         this.state.sortMethod === this.VOTE_SCORE ?
@@ -161,41 +142,43 @@ class TemplateCollection extends Component<IProps, IState> {
                             b.timestamp - a.timestamp)
                     .map((comment, index) => {
                         const beingEdited = this.props.beingEditedID === comment.id;
+                        const { id, body, timestamp, author, voteScore } = comment;
                         return (
                             <Template
-                                ID={comment.id}
-                                body={comment.body}
-                                timestamp={comment.timestamp}
-                                author={comment.author}
+                                ID={id}
+                                body={body}
+                                timestamp={timestamp}
+                                author={author}
                                 type={this.props.pageType}
                                 beingEdited={beingEdited}
-                                voteScore={comment.voteScore}
+                                voteScore={voteScore}
                                 onSubmit={this.handleTemplateSubmit}
                                 key={index}
                             />
                         );
                     });
             } else {
-                return this.props.itemsList
+                return (this.props.itemsList as IPost[])
                     .sort((a, b) =>
                         this.state.sortMethod === this.VOTE_SCORE ?
                             b.voteScore - a.voteScore :
                             b.timestamp - a.timestamp)
                     .map((post, index) => {
                         const beingEdited = this.props.beingEditedID === post.id;
+                        const { id, category, title, body, timestamp, author, voteScore, commentCount } = post;
                         return (
                             <Template
-                                ID={post.id}
-                                category={post.category}
-                                title={post.title}
-                                body={post.body}
-                                timestamp={post.timestamp}
-                                author={post.author}
+                                ID={id}
+                                category={category}
+                                title={title}
+                                body={body}
+                                timestamp={timestamp}
+                                author={author}
                                 type={this.props.pageType}
                                 beingEdited={beingEdited}
-                                voteScore={post.voteScore}
+                                voteScore={voteScore}
                                 onSubmit={this.handleTemplateSubmit}
-                                commentCount={post.commentCount}
+                                commentCount={commentCount}
                                 key={index}
                             />
                         );
@@ -203,7 +186,7 @@ class TemplateCollection extends Component<IProps, IState> {
             }
     }
 
-    updateNewComment =  (event: React.ChangeEvent<HTMLSelectElement>) => {
+    updateNewComment =  (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         switch (event.target.dataset.eventAction) {
             case eventActions.CHANGE_NEW_COMMENT_BODY:
                 this.setState({
@@ -229,10 +212,7 @@ class TemplateCollection extends Component<IProps, IState> {
                         comments: newCommentList
                     });
                 });
-            API.fetchPosts()
-                .then(result => {
-                    this.props.dispatch(updatePostsAction(result));
-                });
+            this.props.dispatch(APIFetchPosts());
         }
     }
 

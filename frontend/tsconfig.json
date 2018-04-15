@@ -11,10 +11,10 @@
     "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
-    "noImplicitThis": false,
+    "noImplicitThis": true,
     "noImplicitAny": false,
     "strictNullChecks": false,
-    "suppressImplicitAnyIndexErrors": false,
+    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false
   },
   "exclude": [

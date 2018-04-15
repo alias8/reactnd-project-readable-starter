@@ -1,6 +1,6 @@
 import { IPost } from '../types/types';
 import { Reducer } from 'redux';
-import { ADD_ONE_POST, DELETE_POST, EDIT_ONE_POST, IAction, UPDATE_POSTS, VOTE_ON_POST } from '../actions/actions';
+import { ADD_ONE_POST, DELETE_POST, EDIT_ONE_POST, IAction, UPDATE_POSTS, VOTE_ON_POST } from '../actions/actionTypes';
 
 export type PostState = {
     posts: IPost[]

@@ -2,23 +2,23 @@ import * as React from 'react';
 import * as API from '../api/api';
 import { ChangeEvent } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
-import { ICategory, IComment, IPost, PageType } from '../types/types';
+import { ICategory, IPost} from '../types/types';
 import '../styles/App.scss';
-import { addOnePostAction, updatePostsAction } from '../actions/actions';
-import { connect, DispatchProp } from 'react-redux';
+import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import TopNav from './TopNav';
+import { addOnePostAction, APIAddNewPost } from '../actions/postActions';
+import { RootState } from '../reducers/TopReducer';
 
 interface IState {
     title: string;
     text: string;
     author: string;
     chosenCategory: string;
-    categories: ICategory[];
     postSubmitted: boolean;
 }
 
 interface IMappedProps {
-
+    categories: ICategory[];
 }
 
 interface IOwnProps {
@@ -35,31 +35,18 @@ class NewPost extends React.Component<IProps, IState> {
             text: '',
             author: '',
             chosenCategory: '',
-            categories: [],
             postSubmitted: false
         };
-    }
-
-    componentDidMount() {
-        API.fetchCategories()
-            .then(result => {
-                this.setState({
-                    categories: result
-                });
-            });
     }
 
     handleSubmit = (event) => {
         event.preventDefault();
         event.stopPropagation();
         if (this.state.chosenCategory !== '') {
-            API.addNewPost(this.state.title, this.state.text, this.state.author, this.state.chosenCategory)
-                .then((result: IPost) => {
-                    this.props.dispatch(addOnePostAction(result));
-                    this.setState({
-                        postSubmitted: true
-                    });
-                });
+            this.props.dispatch(APIAddNewPost(this.state.title, this.state.text, this.state.author, this.state.chosenCategory));
+            this.setState({
+                postSubmitted: true
+            });
         }
     }
 
@@ -89,7 +76,7 @@ class NewPost extends React.Component<IProps, IState> {
 
     render() {
         const categories =
-            this.state.categories.map(category => {
+            this.props.categories.map(category => {
                 return (
                     <button
                         className={category.name === this.state.chosenCategory ? 'clicked-category' : ''}
@@ -146,4 +133,8 @@ class NewPost extends React.Component<IProps, IState> {
     }
 }
 
-export default connect()(NewPost);
+const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
+    categories: state.categories.categories,
+});
+
+export default connect(mapStateToProps)(NewPost);
