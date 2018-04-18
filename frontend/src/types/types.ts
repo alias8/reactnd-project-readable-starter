@@ -26,9 +26,19 @@ export interface ICategory {
     path: string;
 }
 
-export enum PageType {
-    LISTED_POST = 'LISTED_POST',
-    POST = 'POST',
-    COMMENT = 'COMMENT'
-
+export enum TemplateType {
+    LIST_OF_POSTS = 'LIST_OF_POSTS',
+    SINGLE_POST = 'SINGLE_POST',
+    LIST_OF_COMMENTS = 'LIST_OF_COMMENTS'
 }
+
+export const ShouldDisplayTopNav = {};
+[TemplateType.LIST_OF_POSTS, TemplateType.SINGLE_POST].forEach((name) => {
+	ShouldDisplayTopNav[name] = true;
+});
+
+export const ShouldDisplaySort = {};
+[TemplateType.LIST_OF_POSTS, TemplateType.LIST_OF_COMMENTS].forEach((name) => {
+	ShouldDisplaySort[name] = true;
+});
+

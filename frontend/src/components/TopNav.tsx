@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
-import { ICategory, IComment, IPost, PageType } from '../types/types';
+import { ICategory, IComment, IPost, ShouldDisplayTopNav, TemplateType } from '../types/types';
 import { NavLink } from 'react-router-dom';
 import { Component } from 'react';
 
@@ -14,7 +14,7 @@ interface IState {
 }
 
 interface IOwnProps {
-
+	pageType: TemplateType
 }
 
 type IProps = IOwnProps & IMappedProps & DispatchProp<{}>;
@@ -54,14 +54,17 @@ class TopNav extends Component<IProps, IState> {
     }
 
     render() {
-        return (
-            <div>
-                <div className={'top-navlink-container'}>
-                    {this.formLinksFromCategories()}
-                </div>
-            </div>
-        );
-    }
+		return ShouldDisplayTopNav[this.props.pageType] ? (
+			<div>
+				<div className={'top-navlink-container'}>
+					{this.formLinksFromCategories()}
+				</div>
+			</div>
+		) : (
+			<div/>
+		);
+
+	}
 
 }
 

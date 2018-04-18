@@ -3,7 +3,7 @@ import { Component } from 'react';
 import { Redirect, RouteComponentProps, withRouter } from 'react-router';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
-import { IPost, PageType } from '../types/types';
+import { IPost, TemplateType } from '../types/types';
 import '../styles/App.scss';
 import TemplateCollection from './TemplateCollection';
 
@@ -32,7 +32,7 @@ class Category extends Component<IProps, IState> {
             <Redirect to={'/404'}/>
         ) : (
             <TemplateCollection
-                pageType={PageType.LISTED_POST}
+                pageType={TemplateType.LIST_OF_POSTS}
                 itemsList={this.props.posts}
             />
         );

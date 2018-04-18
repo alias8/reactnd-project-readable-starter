@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ICategory, IPost, PageType } from '../types/types';
+import { ICategory, IPost, TemplateType } from '../types/types';
 import { Redirect, RouteComponentProps, withRouter } from 'react-router';
 import { connect, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
@@ -56,11 +56,11 @@ export class PostPage extends React.Component<IProps, IState> {
         ) : (
             <div>
                 <TemplateCollection
-                    pageType={PageType.POST}
+                    pageType={TemplateType.SINGLE_POST}
                     itemsList={this.props.originalParentPost}
                 />
                 <TemplateCollection
-                    pageType={PageType.COMMENT}
+                    pageType={TemplateType.LIST_OF_COMMENTS}
                     parentPostID={this.state.originalParentPostId}
                     itemsList={[]}
                 />

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Textarea from 'react-textarea-autosize';
 import * as moment from 'moment';
-import { PageType } from '../types/types';
+import { TemplateType } from '../types/types';
 import { Link } from 'react-router-dom';
 
 interface IState {
@@ -16,7 +16,7 @@ interface IOwnProps {
     beingEdited: boolean;
     timestamp: number;
     author: string;
-    type: PageType;
+    type: TemplateType;
     voteScore: number;
     onSubmit: (event: IEvent) => void;
     category?: string;
@@ -103,7 +103,7 @@ export class Template extends React.Component<IProps, IState> {
                 />
             );
         let title;
-        if (this.props.type === PageType.POST) {
+        if (this.props.type === TemplateType.SINGLE_POST) {
             title = titleAsTextArea;
         } else {
             if (this.props.beingEdited) {
@@ -130,7 +130,7 @@ export class Template extends React.Component<IProps, IState> {
                     </div>
                     <div className={'comment-right-side'}>
                         {title}
-                        {this.props.type !== PageType.LISTED_POST &&
+                        {this.props.type !== TemplateType.LIST_OF_POSTS &&
                         <Textarea
                             data-event-action={eventActions.CHANGE_EDITED_BODY}
                             onChange={this.handleChange}
@@ -142,13 +142,13 @@ export class Template extends React.Component<IProps, IState> {
                             <div
                                 className={'first-line'}
                             >submitted {moment(this.props.timestamp).fromNow()} by {this.props.author}
-                                {this.props.type === PageType.LISTED_POST &&
+                                {this.props.type === TemplateType.LIST_OF_POSTS &&
                                 <span> to <Link to={`${this.props.category}`}>{this.props.category}</Link>
                             </span>
                                 }
                             </div>
                             <div className={'second-line'}>
-                                {this.props.type !== PageType.COMMENT &&
+                                {this.props.type !== TemplateType.LIST_OF_COMMENTS &&
                                 <span>{this.props.commentCount} comments </span>
                                 }
                                 <button

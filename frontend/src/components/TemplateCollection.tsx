@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ICategory, IComment, IPost, PageType } from '../types/types';
+import { ShouldDisplayTopNav, ICategory, IComment, IPost, TemplateType, ShouldDisplaySort } from '../types/types';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -12,17 +12,20 @@ import {
     APIDeletePost,
     APIEditDetailsOfExistingPost, APIFetchPosts,
     APIVoteOnPost,
-    deletePostAction,
-    editOnePost,
-    updatePostsAction,
-    voteOnPostAction
 } from '../actions/postActions';
-import { APIFetchCategories, updateCategoriesAction } from '../actions/categoriesActions';
+import { APIFetchCategories } from '../actions/categoriesActions';
 import { changeEditedID } from '../actions/editingActions';
 import { APIDeleteComment } from '../actions/commentActions';
+import { RenderList } from "./RenderList";
+import { SortContainer } from "./SortContainer";
+
+export enum sortType {
+	VOTE_SCORE = 'VOTE_SCORE',
+	TIME_STAMP = 'TIME_STAMP',
+}
 
 interface IState {
-    sortMethod: string;
+    sortMethod: sortType;
     comments: IComment[];
     newCommentBody: string;
     newCommentAuthor: string;
@@ -34,7 +37,7 @@ interface IMappedProps {
 }
 
 interface IOwnProps {
-    pageType: PageType;
+    pageType: TemplateType;
     itemsList: IPost[] | IComment[];
     parentPostID?: string;
 }
@@ -42,15 +45,10 @@ interface IOwnProps {
 type IProps = IOwnProps & IMappedProps & DispatchProp<{}>;
 
 class TemplateCollection extends Component<IProps, IState> {
-    private TIME_STAMP: string;
-    private VOTE_SCORE: string;
-
     constructor(props: IProps) {
         super(props);
-        this.VOTE_SCORE = 'VOTE_SCORE';
-        this.TIME_STAMP = 'TIME_STAMP';
         this.state = {
-            sortMethod: this.VOTE_SCORE,
+            sortMethod: sortType.VOTE_SCORE,
             comments: [],
             newCommentBody: '',
             newCommentAuthor: ''
@@ -63,7 +61,7 @@ class TemplateCollection extends Component<IProps, IState> {
     }
 
     componentWillReceiveProps(nextProps: IProps) {
-        if (this.props.pageType === PageType.COMMENT && nextProps.parentPostID !== '') {
+        if (this.props.pageType === TemplateType.LIST_OF_COMMENTS && nextProps.parentPostID !== '') {
             API.getCommentsForPost(nextProps.parentPostID)
                 .then((result) => {
                     this.setState({
@@ -80,15 +78,15 @@ class TemplateCollection extends Component<IProps, IState> {
 
     updateSortMethod = (e: React.ChangeEvent<HTMLSelectElement>): void => {
         this.setState({
-            sortMethod: e.currentTarget.value
+            sortMethod: (e.currentTarget.value as sortType)
         });
-    }
+    };
 
     handleTemplateSubmit = (event: IEvent) => {
         switch (event.action) {
             case eventActions.UPVOTE:
             case eventActions.DOWNVOTE:
-                if (event.type === PageType.COMMENT) {
+                if (event.type === TemplateType.LIST_OF_COMMENTS) {
                     API.voteOnComment(event.ID, event.action)
                         .then((result) => {
                             const newCommentList = this.state.comments.filter((comment) => comment.id !== result.id);
@@ -106,9 +104,9 @@ class TemplateCollection extends Component<IProps, IState> {
                 break;
             case eventActions.CLEAR_EDIT_ID:
                 this.props.dispatch(changeEditedID(''));
-                if (event.type === PageType.POST) {
+                if (event.type === TemplateType.SINGLE_POST) {
                     this.props.dispatch(APIEditDetailsOfExistingPost(event.ID, event.title, event.body));
-                } else if (event.type === PageType.COMMENT) {
+                } else if (event.type === TemplateType.LIST_OF_COMMENTS) {
                     API.editDetailsOfExistingComment(event.ID, event.body)
                         .then((result: IComment) => {
                             const newCommentList = this.state.comments.filter((comment) => comment.id !== result.id);
@@ -120,7 +118,7 @@ class TemplateCollection extends Component<IProps, IState> {
                 }
                 break;
             case eventActions.DELETE_POST:
-                if (event.type === PageType.COMMENT) {
+                if (event.type === TemplateType.LIST_OF_COMMENTS) {
                     this.props.dispatch(APIDeleteComment(event.ID));
                     this.setState({
                         comments: this.state.comments.filter((comment) => comment.id !== event.ID)
@@ -131,60 +129,7 @@ class TemplateCollection extends Component<IProps, IState> {
                 break;
             default:
         }
-    }
-
-    renderList() {
-            if (this.props.pageType === PageType.COMMENT) {
-                return this.state.comments
-                    .sort((a, b) =>
-                        this.state.sortMethod === this.VOTE_SCORE ?
-                            b.voteScore - a.voteScore :
-                            b.timestamp - a.timestamp)
-                    .map((comment, index) => {
-                        const beingEdited = this.props.beingEditedID === comment.id;
-                        const { id, body, timestamp, author, voteScore } = comment;
-                        return (
-                            <Template
-                                ID={id}
-                                body={body}
-                                timestamp={timestamp}
-                                author={author}
-                                type={this.props.pageType}
-                                beingEdited={beingEdited}
-                                voteScore={voteScore}
-                                onSubmit={this.handleTemplateSubmit}
-                                key={index}
-                            />
-                        );
-                    });
-            } else {
-                return (this.props.itemsList as IPost[])
-                    .sort((a, b) =>
-                        this.state.sortMethod === this.VOTE_SCORE ?
-                            b.voteScore - a.voteScore :
-                            b.timestamp - a.timestamp)
-                    .map((post, index) => {
-                        const beingEdited = this.props.beingEditedID === post.id;
-                        const { id, category, title, body, timestamp, author, voteScore, commentCount } = post;
-                        return (
-                            <Template
-                                ID={id}
-                                category={category}
-                                title={title}
-                                body={body}
-                                timestamp={timestamp}
-                                author={author}
-                                type={this.props.pageType}
-                                beingEdited={beingEdited}
-                                voteScore={voteScore}
-                                onSubmit={this.handleTemplateSubmit}
-                                commentCount={commentCount}
-                                key={index}
-                            />
-                        );
-                    });
-            }
-    }
+    };
 
     updateNewComment =  (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         switch (event.target.dataset.eventAction) {
@@ -200,7 +145,7 @@ class TemplateCollection extends Component<IProps, IState> {
                 break;
             default:
         }
-    }
+    };
 
     submitNewComment = () => {
         if (this.state.newCommentBody !== '' && this.state.newCommentAuthor !== '') {
@@ -214,25 +159,21 @@ class TemplateCollection extends Component<IProps, IState> {
                 });
             this.props.dispatch(APIFetchPosts());
         }
-    }
+    };
 
     render() {
         return (
             <div>
-                {this.props.pageType !== PageType.COMMENT &&
-                <TopNav/>
-                }
-                {this.props.pageType !== PageType.POST &&
-                <div className={'sort-container'}>
-                    <div>Sort:</div>
-                    <select value={this.state.sortMethod} onChange={this.updateSortMethod}>
-                        <option value={this.VOTE_SCORE}>Score (highest first)</option>
-                        <option value={this.TIME_STAMP}>Time (newest first)</option>
-                    </select>
-                </div>
-                }
+				<TopNav
+					pageType={this.props.pageType}
+				/>
+				<SortContainer
+					updateSortMethod={this.updateSortMethod}
+					sortMethod={this.state.sortMethod}
+					pageType={this.props.pageType}
+				/>
                 <hr className={'thick-hr'}/>
-                {this.props.pageType === PageType.COMMENT &&
+                {this.props.pageType === TemplateType.LIST_OF_COMMENTS &&
                 <div className={'add-new-comment-container'}>
                     <div>
                         <div>Add a comment:</div>
@@ -259,9 +200,16 @@ class TemplateCollection extends Component<IProps, IState> {
 
                 <div className={'main-flex-container'}>
                     <div className={'post-list'}>
-                        {this.renderList()}
+						<RenderList
+							pageType={this.props.pageType}
+							sortMethod={this.state.sortMethod}
+							beingEditedID={this.props.beingEditedID}
+							handleTemplateSubmit={this.handleTemplateSubmit}
+							comments={this.state.comments}
+							itemsList={this.props.itemsList}
+						/>
                     </div>
-                    {this.props.pageType !== PageType.COMMENT &&
+                    {this.props.pageType !== TemplateType.LIST_OF_COMMENTS &&
                     <div className={'add-new-post'}>
                         <Link to={`/new`}>
                             Submit new post

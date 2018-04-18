@@ -28,12 +28,12 @@ export const editOnePost = (post: IPost) => ({
 });
 
 export const APIAddNewPost = (title, text, author, chosenCategory) => {
-    return function (dispatch)  {
-        API.addNewPost(title, text, author, chosenCategory)
-            .then((result: IPost) => {
-                dispatch(addOnePostAction(result));
-            });
-    };
+    return (dispatch) => {
+		return API.addNewPost(title, text, author, chosenCategory)
+			.then((result: IPost) => {
+				dispatch(addOnePostAction(result));
+			});
+	};
 };
 
 export const APIVoteOnPost = (ID, action) => {
