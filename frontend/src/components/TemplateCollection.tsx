@@ -18,6 +18,7 @@ import { changeEditedID } from '../actions/editingActions';
 import { APIDeleteComment } from '../actions/commentActions';
 import { RenderList } from "./RenderList";
 import { SortContainer } from "./SortContainer";
+import { NewCommentContainer } from "./NewCommentContainer";
 
 export enum sortType {
 	VOTE_SCORE = 'VOTE_SCORE',
@@ -173,31 +174,9 @@ class TemplateCollection extends Component<IProps, IState> {
 					pageType={this.props.pageType}
 				/>
                 <hr className={'thick-hr'}/>
-                {this.props.pageType === TemplateType.LIST_OF_COMMENTS &&
-                <div className={'add-new-comment-container'}>
-                    <div>
-                        <div>Add a comment:</div>
-                        <Textarea
-                            placeholder={'start typing your comment!'}
-                            data-event-action={eventActions.CHANGE_NEW_COMMENT_BODY}
-                            value={this.state.newCommentBody}
-                            onChange={this.updateNewComment}
-                            required={true}
-                            className={'input-field'}
-                        />
-                        <Textarea
-                            placeholder={'comment author\'s name'}
-                            data-event-action={eventActions.CHANGE_NEW_COMMENT_AUTHOR}
-                            value={this.state.newCommentAuthor}
-                            onChange={this.updateNewComment}
-                            required={true}
-                            className={'input-field'}
-                        />
-                        <button onClick={this.submitNewComment}>Submit comment</button>
-                    </div>
-                </div>
-                }
-
+				<NewCommentContainer
+					pageType={this.props.pageType}
+				/>
                 <div className={'main-flex-container'}>
                     <div className={'post-list'}>
 						<RenderList
@@ -209,12 +188,9 @@ class TemplateCollection extends Component<IProps, IState> {
 							itemsList={this.props.itemsList}
 						/>
                     </div>
-                    {this.props.pageType !== TemplateType.LIST_OF_COMMENTS &&
-                    <div className={'add-new-post'}>
-                        <Link to={`/new`}>
-                            Submit new post
-                        </Link>
-                    </div>
+					<NewCommentContainer
+						pageType={this.props.pageType}
+					/>
                     }
                 </div>
 
