@@ -8,7 +8,7 @@ interface IOwnProps {
 
 type IProps = IOwnProps;
 
-export const NewCommentContainer: React.SFC<IProps> = (props) => {
+export const AddNewPost: React.SFC<IProps> = (props) => {
 	return props.pageType !== TemplateType.LIST_OF_COMMENTS ? (
 		<div className={'add-new-post'}>
 			<Link to={`/new`}>

@@ -1,5 +1,5 @@
 import { IPost } from '../types/types';
-import { ADD_ONE_POST, DELETE_POST, EDIT_ONE_POST, UPDATE_POSTS, VOTE_ON_POST } from './actionTypes';
+import { ADD_ONE_POST, COMPLETE_FETCH_POSTS, DELETE_POST, EDIT_ONE_POST, IN_PROGRESS_FETCH_POSTS, UPDATE_POSTS, VOTE_ON_POST } from './actionTypes';
 import * as API from '../api/api';
 
 export const addOnePostAction = (post: IPost) => ({
@@ -25,6 +25,14 @@ export const updatePostsAction = (posts: IPost[]) => ({
 export const editOnePost = (post: IPost) => ({
     type: EDIT_ONE_POST,
     post: post
+});
+
+const fetchingPostsInProgress = () => ({
+	type: IN_PROGRESS_FETCH_POSTS
+});
+
+const fetchingPostsComplete = () => ({
+	type: COMPLETE_FETCH_POSTS
 });
 
 export const APIAddNewPost = (title, text, author, chosenCategory) => {
@@ -65,9 +73,14 @@ export const APIDeletePost = (ID) => {
 
 export const APIFetchPosts = () => {
     return (dispatch) => {
+    	dispatch(fetchingPostsInProgress());
         API.fetchPosts()
             .then(result => {
                 dispatch(updatePostsAction(result));
-            });
+                dispatch(fetchingPostsComplete());
+            })
+			.catch((result) => {
+        		dispatch(fetchingPostsComplete());
+			})
     }
-}
+};

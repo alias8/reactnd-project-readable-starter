@@ -1,13 +1,11 @@
 import * as React from 'react';
-import { ShouldDisplayTopNav, ICategory, IComment, IPost, TemplateType, ShouldDisplaySort } from '../types/types';
+import { ICategory, IComment, IPost, TemplateType} from '../types/types';
 import { Component } from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { RootState } from '../reducers/TopReducer';
-import { eventActions, IEvent, Template } from './Template';
+import { eventActions, IEvent} from './Template';
 import * as API from '../api/api';
 import TopNav from './TopNav';
-import Textarea from 'react-textarea-autosize';
 import {
     APIDeletePost,
     APIEditDetailsOfExistingPost, APIFetchPosts,
@@ -19,6 +17,7 @@ import { APIDeleteComment } from '../actions/commentActions';
 import { RenderList } from "./RenderList";
 import { SortContainer } from "./SortContainer";
 import { NewCommentContainer } from "./NewCommentContainer";
+import { AddNewPost } from "./AddNewPost";
 
 export enum sortType {
 	VOTE_SCORE = 'VOTE_SCORE',
@@ -39,7 +38,7 @@ interface IMappedProps {
 
 interface IOwnProps {
     pageType: TemplateType;
-    itemsList: IPost[] | IComment[];
+    listOfPosts: IPost[];
     parentPostID?: string;
 }
 
@@ -176,6 +175,11 @@ class TemplateCollection extends Component<IProps, IState> {
                 <hr className={'thick-hr'}/>
 				<NewCommentContainer
 					pageType={this.props.pageType}
+					submitNewComment={this.submitNewComment}
+					updateNewComment={this.updateNewComment}
+					newCommentBody={this.state.newCommentBody}
+					newCommentAuthor={this.state.newCommentAuthor}
+
 				/>
                 <div className={'main-flex-container'}>
                     <div className={'post-list'}>
@@ -184,11 +188,11 @@ class TemplateCollection extends Component<IProps, IState> {
 							sortMethod={this.state.sortMethod}
 							beingEditedID={this.props.beingEditedID}
 							handleTemplateSubmit={this.handleTemplateSubmit}
-							comments={this.state.comments}
-							itemsList={this.props.itemsList}
+							listOfComments={this.state.comments}
+							listOfPosts={this.props.listOfPosts}
 						/>
                     </div>
-					<NewCommentContainer
+					<AddNewPost
 						pageType={this.props.pageType}
 					/>
                     }

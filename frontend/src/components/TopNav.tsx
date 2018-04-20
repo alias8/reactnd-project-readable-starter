@@ -36,7 +36,7 @@ export const TopNav: React.SFC<IProps> = (props) => {
 			</NavLink>
 		);
 
-		this.props.categories.forEach((category, index) => (
+		props.categories.forEach((category, index) => (
 			categoryLinks.push(
 				<NavLink
 					className={'top-navlink'}
@@ -57,7 +57,7 @@ export const TopNav: React.SFC<IProps> = (props) => {
 	return ShouldDisplayTopNav[props.pageType] ? (
 		<div>
 			<div className={'top-navlink-container'}>
-				{this.formLinksFromCategories()}
+				{formLinksFromCategories()}
 			</div>
 		</div>
 	) : (

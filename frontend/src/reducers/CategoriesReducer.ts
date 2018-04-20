@@ -1,13 +1,15 @@
 import { ICategory, IPost } from '../types/types';
 import { Reducer } from 'redux';
-import { IAction, UPDATE_CATEGORIES } from '../actions/actionTypes';
+import { COMPLETE_FETCH_CATEGORIES, IAction, IN_PROGRESS_FETCH_CATEGORIES, UPDATE_CATEGORIES } from '../actions/actionTypes';
 
 export type CategoriesState = {
-    categories: ICategory[]
+    categories: ICategory[],
+	fetching: boolean
 };
 
 const initialState: CategoriesState = {
-    categories: []
+    categories: [],
+	fetching: false
 };
 
 const reducer: Reducer<CategoriesState> = (state = initialState, action: IAction) => {
@@ -17,6 +19,16 @@ const reducer: Reducer<CategoriesState> = (state = initialState, action: IAction
                 ...state,
                 categories: action.categories
             };
+		case IN_PROGRESS_FETCH_CATEGORIES:
+			return {
+				...state,
+				fetching: true
+			};
+		case COMPLETE_FETCH_CATEGORIES:
+			return {
+				...state,
+				fetching: false
+			};
         default:
             return state;
     }

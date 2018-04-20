@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as API from '../api/api';
 import { ChangeEvent } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
-import { ICategory, IPost} from '../types/types';
+import { ICategory, IPost, TemplateType } from '../types/types';
 import '../styles/App.scss';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import TopNav from './TopNav';
@@ -25,9 +25,9 @@ interface IOwnProps {
 
 }
 
-type IProps = IOwnProps & IMappedProps & RouteComponentProps<{}> & DispatchProp<{}>;
+type IProps = IOwnProps & IMappedProps & DispatchProp<{}>;
 
-class NewPost extends React.Component<IProps, IState> {
+export class NewPost extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -94,7 +94,9 @@ class NewPost extends React.Component<IProps, IState> {
         } else {
             return (
                 <div>
-                    <TopNav/>
+                    <TopNav
+						pageType={TemplateType.LIST_OF_POSTS}
+					/>
                     <div className={'top-buffer'}/>
                     <hr className={'thick-hr'}/>
                     <div className={'new-post-container'}>

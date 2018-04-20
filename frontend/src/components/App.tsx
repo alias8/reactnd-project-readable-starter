@@ -16,7 +16,7 @@ type IProps = IMappedProps & RouteComponentProps<{}>;
 const App: React.SFC<IProps> = (props) => (
 	<TemplateCollection
 		pageType={TemplateType.LIST_OF_POSTS}
-		itemsList={props.posts}
+		listOfPosts={props.posts}
 	/>
 );
 

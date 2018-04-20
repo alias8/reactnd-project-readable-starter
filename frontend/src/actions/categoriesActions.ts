@@ -1,6 +1,5 @@
 import { ICategory } from '../types/types';
-import { UPDATE_CATEGORIES } from './actionTypes';
-import { updatePostsAction } from './postActions';
+import { COMPLETE_FETCH_CATEGORIES, IN_PROGRESS_FETCH_CATEGORIES, UPDATE_CATEGORIES } from './actionTypes';
 import * as API from '../api/api';
 
 export const updateCategoriesAction = (categories: ICategory[]) => ({
@@ -8,11 +7,24 @@ export const updateCategoriesAction = (categories: ICategory[]) => ({
     categories: categories
 });
 
+const fetchingCategoriesInProgress = () => ({
+	type: IN_PROGRESS_FETCH_CATEGORIES
+});
+
+const fetchingCategoriesComplete = () => ({
+	type: COMPLETE_FETCH_CATEGORIES
+});
+
 export const APIFetchCategories = () => {
     return (dispatch) => {
+		dispatch(fetchingCategoriesInProgress());
         API.fetchCategories()
             .then(result => {
                 dispatch(updateCategoriesAction(result));
-            });
+				dispatch(fetchingCategoriesComplete());
+            })
+			.catch((result) => {
+        		dispatch(fetchingCategoriesComplete());
+			})
     };
 };
