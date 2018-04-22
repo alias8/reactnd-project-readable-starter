@@ -34,11 +34,11 @@ export enum TemplateType {
 
 export const ShouldDisplayTopNav = {};
 [TemplateType.LIST_OF_POSTS, TemplateType.SINGLE_POST].forEach((name) => {
-	ShouldDisplayTopNav[name] = true;
+    ShouldDisplayTopNav[name] = true;
 });
 
 export const ShouldDisplaySort = {};
 [TemplateType.LIST_OF_POSTS, TemplateType.LIST_OF_COMMENTS].forEach((name) => {
-	ShouldDisplaySort[name] = true;
+    ShouldDisplaySort[name] = true;
 });
 

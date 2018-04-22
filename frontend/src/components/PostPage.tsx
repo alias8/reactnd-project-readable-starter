@@ -52,13 +52,13 @@ export class PostPage extends React.Component<IProps, IState> {
         ) : (
             <div>
                 <TemplateCollection
-					pageType={TemplateType.SINGLE_POST}
-					listOfPosts={this.props.originalParentPost}
+                    pageType={TemplateType.SINGLE_POST}
+                    listOfPosts={this.props.originalParentPost}
                 />
                 <TemplateCollection
-					pageType={TemplateType.LIST_OF_COMMENTS}
-					parentPostID={this.state.originalParentPostId}
-					listOfPosts={[]}
+                    pageType={TemplateType.LIST_OF_COMMENTS}
+                    parentPostID={this.state.originalParentPostId}
+                    listOfPosts={[]}
                 />
             </div>
         );

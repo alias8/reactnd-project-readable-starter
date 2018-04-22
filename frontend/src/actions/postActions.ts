@@ -1,5 +1,13 @@
 import { IPost } from '../types/types';
-import { ADD_ONE_POST, COMPLETE_FETCH_POSTS, DELETE_POST, EDIT_ONE_POST, IN_PROGRESS_FETCH_POSTS, UPDATE_POSTS, VOTE_ON_POST } from './actionTypes';
+import {
+    ADD_ONE_POST,
+    COMPLETE_FETCH_POSTS,
+    DELETE_POST,
+    EDIT_ONE_POST,
+    IN_PROGRESS_FETCH_POSTS,
+    UPDATE_POSTS,
+    VOTE_ON_POST
+} from './actionTypes';
 import * as API from '../api/api';
 
 export const addOnePostAction = (post: IPost) => ({
@@ -28,20 +36,20 @@ export const editOnePost = (post: IPost) => ({
 });
 
 const fetchingPostsInProgress = () => ({
-	type: IN_PROGRESS_FETCH_POSTS
+    type: IN_PROGRESS_FETCH_POSTS
 });
 
 const fetchingPostsComplete = () => ({
-	type: COMPLETE_FETCH_POSTS
+    type: COMPLETE_FETCH_POSTS
 });
 
 export const APIAddNewPost = (title, text, author, chosenCategory) => {
     return (dispatch) => {
-		return API.addNewPost(title, text, author, chosenCategory)
-			.then((result: IPost) => {
-				dispatch(addOnePostAction(result));
-			});
-	};
+        return API.addNewPost(title, text, author, chosenCategory)
+            .then((result: IPost) => {
+                dispatch(addOnePostAction(result));
+            });
+    };
 };
 
 export const APIVoteOnPost = (ID, action) => {
@@ -73,14 +81,14 @@ export const APIDeletePost = (ID) => {
 
 export const APIFetchPosts = () => {
     return (dispatch) => {
-    	dispatch(fetchingPostsInProgress());
+        dispatch(fetchingPostsInProgress());
         API.fetchPosts()
             .then(result => {
                 dispatch(updatePostsAction(result));
                 dispatch(fetchingPostsComplete());
             })
-			.catch((result) => {
-        		dispatch(fetchingPostsComplete());
-			})
+            .catch((result) => {
+                dispatch(fetchingPostsComplete());
+            })
     }
 };

@@ -1,6 +1,5 @@
-import { PostState } from './PostsReducer';
+import posts, { PostState } from './PostsReducer';
 import { combineReducers, Reducer } from 'redux';
-import posts from './PostsReducer';
 import categories, { CategoriesState } from './CategoriesReducer';
 import editing, { EditState } from './EditingReducer';
 

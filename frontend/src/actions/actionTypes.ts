@@ -16,5 +16,6 @@ export const COMPLETE_FETCH_POSTS = 'COMPLETE_FETCH_POSTS';
 
 export interface IAction {
     type: string;
+
     [propName: string]: any;
 }

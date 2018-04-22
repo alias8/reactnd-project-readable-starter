@@ -8,20 +8,20 @@ import '../styles/App.scss';
 import TemplateCollection from './TemplateCollection';
 
 interface IMappedProps {
-	posts: IPost[];
+    posts: IPost[];
 }
 
 type IProps = IMappedProps & RouteComponentProps<{}>;
 
 const App: React.SFC<IProps> = (props) => (
-	<TemplateCollection
-		pageType={TemplateType.LIST_OF_POSTS}
-		listOfPosts={props.posts}
-	/>
+    <TemplateCollection
+        pageType={TemplateType.LIST_OF_POSTS}
+        listOfPosts={props.posts}
+    />
 );
 
 const mapStateToProps: MapStateToProps<IMappedProps, {}, RootState> = (state: RootState, props: IProps) => ({
-	posts: state.posts.posts,
+    posts: state.posts.posts,
 });
 
 export default withRouter<any>(connect(mapStateToProps)(App));

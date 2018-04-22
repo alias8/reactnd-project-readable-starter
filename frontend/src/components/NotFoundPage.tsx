@@ -3,6 +3,6 @@ import '../styles/App.scss';
 
 export const NotFoundPage = () => {
     return (
-     <div>Page not found</div>
+        <div>Page not found</div>
     );
 };
