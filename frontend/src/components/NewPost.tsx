@@ -1,12 +1,11 @@
 import * as React from 'react';
-import * as API from '../api/api';
 import { ChangeEvent } from 'react';
-import { Redirect, RouteComponentProps } from 'react-router';
-import { ICategory, IPost, TemplateType } from '../types/types';
+import { Redirect } from 'react-router';
+import { ICategory, TemplateType } from '../types/types';
 import '../styles/App.scss';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import TopNav from './TopNav';
-import { addOnePostAction, APIAddNewPost } from '../actions/postActions';
+import { APIAddNewPost } from '../actions/postActions';
 import { RootState } from '../reducers/TopReducer';
 
 interface IState {
@@ -21,11 +20,7 @@ interface IMappedProps {
     categories: ICategory[];
 }
 
-interface IOwnProps {
-
-}
-
-type IProps = IOwnProps & IMappedProps & DispatchProp<{}>;
+type IProps = IMappedProps & DispatchProp<{}>;
 
 export class NewPost extends React.Component<IProps, IState> {
     constructor(props: IProps) {
@@ -48,31 +43,31 @@ export class NewPost extends React.Component<IProps, IState> {
                 postSubmitted: true
             });
         }
-    }
+    };
 
     handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
         this.setState({
             title: event.currentTarget.value
         });
-    }
+    };
 
     handleAuthorChange = (event: ChangeEvent<HTMLInputElement>) => {
         this.setState({
             author: event.currentTarget.value
         });
-    }
+    };
 
     handleTextChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         this.setState({
             text: event.currentTarget.value
         });
-    }
+    };
 
     handleCategoryChange = (event: React.MouseEvent<HTMLButtonElement>) => {
         this.setState({
             chosenCategory: event.currentTarget.innerHTML
         });
-    }
+    };
 
     render() {
         const categories =
@@ -135,7 +130,7 @@ export class NewPost extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => ({
+const mapStateToProps: MapStateToProps<IMappedProps, {}, RootState> = (state: RootState, props: IProps) => ({
     categories: state.categories.categories,
 });
 

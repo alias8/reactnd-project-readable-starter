@@ -17,16 +17,12 @@ interface IMappedProps {
     wrongRoute: boolean;
 }
 
-interface IOwnProps {
-
-}
-
 interface IPostPageUrl {
     category: string;
     id: string;
 }
 
-type IProps = IOwnProps & IMappedProps & RouteComponentProps<IPostPageUrl>;
+type IProps = IMappedProps & RouteComponentProps<IPostPageUrl>;
 
 export class PostPage extends React.Component<IProps, IState> {
     private TIME_STAMP: string;
@@ -42,7 +38,7 @@ export class PostPage extends React.Component<IProps, IState> {
         };
     }
 
-    componentWillReceiveProps(nextProps: IProps) {
+	componentWillReceiveProps(nextProps: IProps) {
         if (nextProps.originalParentPost.length > 0) {
             this.setState({
                 originalParentPostId: nextProps.originalParentPost[0].id
@@ -69,7 +65,7 @@ export class PostPage extends React.Component<IProps, IState> {
     }
 }
 
-const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (state: RootState, props: IProps) => {
+const mapStateToProps: MapStateToProps<IMappedProps, {}, RootState> = (state: RootState, props: IProps) => {
     const filteredPosts = state.posts.posts.filter(post => post.id === props.match.params.id);
     const wrongRoute = state.posts.posts.length > 0 && filteredPosts.length === 0;
     return {

@@ -58,7 +58,7 @@ export class Template extends React.Component<IProps, IState> {
             action: event.target.dataset.eventAction
         };
         this.props.onSubmit(myEvent);
-    }
+    };
 
     componentWillReceiveProps(nextProps: IProps) {
         this.setState({
@@ -81,7 +81,7 @@ export class Template extends React.Component<IProps, IState> {
                 break;
             default:
         }
-    }
+    };
 
     render() {
         const textAreaClassNames = ['no-black-outline-textbox', 'post-title'];

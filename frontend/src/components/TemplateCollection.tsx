@@ -14,7 +14,7 @@ import {
 import { APIFetchCategories } from '../actions/categoriesActions';
 import { changeEditedID } from '../actions/editingActions';
 import { APIDeleteComment } from '../actions/commentActions';
-import { RenderList } from "./RenderList";
+import RenderList from "./RenderList";
 import { SortContainer } from "./SortContainer";
 import { NewCommentContainer } from "./NewCommentContainer";
 import { AddNewPost } from "./AddNewPost";
@@ -61,7 +61,7 @@ class TemplateCollection extends Component<IProps, IState> {
     }
 
     componentWillReceiveProps(nextProps: IProps) {
-        if (this.props.pageType === TemplateType.LIST_OF_COMMENTS && nextProps.parentPostID !== '') {
+        if (nextProps.pageType === TemplateType.LIST_OF_COMMENTS && nextProps.parentPostID !== '') {
             API.getCommentsForPost(nextProps.parentPostID)
                 .then((result) => {
                     this.setState({

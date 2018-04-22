@@ -29,20 +29,22 @@ const reducer: Reducer<PostState> = (state = initialState, action: IAction) => {
                 ...state,
                 posts: state.posts.map(post => post.id === action.post.id ? action.post : post)
             };
-        case EDIT_ONE_POST:
-            const newPostList =  state.posts.filter(post => post.id !== action.post.id);
-            newPostList.push(action.post);
-            return {
-                ...state,
-                posts: newPostList
-            };
-        case ADD_ONE_POST:
-            const newPostList1 =  state.posts.filter(post => post.id !== action.post.id);
-            newPostList1.push(action.post);
-            return {
-                ...state,
-                posts: newPostList1
-            };
+        case EDIT_ONE_POST: {
+			const newPostList = state.posts.filter(post => post.id !== action.post.id);
+			newPostList.push(action.post);
+			return {
+				...state,
+				posts: newPostList
+			};
+		}
+        case ADD_ONE_POST: {
+			const newPostList = state.posts.filter(post => post.id !== action.post.id);
+			newPostList.push(action.post);
+			return {
+				...state,
+				posts: newPostList
+			};
+		}
 		case COMPLETE_FETCH_POSTS:
 			return {
 				...state,

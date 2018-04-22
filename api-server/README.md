@@ -1,8 +1,11 @@
 # API Server
 
-To install and start the API server, run the following commands in this directory:
+This server code was provided as part of the project, and shouldn't have
+to be modified.
+To install and start the API server, run the following
+commands from the directory one level above this one:
 
-* `yarn`
+* `yarn run install`
 * `yarn run server`
 
 ## Using The Server

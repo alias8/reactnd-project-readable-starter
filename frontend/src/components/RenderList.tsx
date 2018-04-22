@@ -2,6 +2,10 @@ import * as React from 'react';
 import { IComment, IPost, TemplateType } from "../types/types";
 import { sortType } from "./TemplateCollection";
 import { IEvent, Template } from "./Template";
+import { connect, MapStateToProps } from "react-redux";
+import { withRouter } from "react-router";
+import { Category } from "./Category";
+import { RootState } from "../reducers/TopReducer";
 
 interface IOwnProps {
 	pageType: TemplateType;
@@ -12,7 +16,11 @@ interface IOwnProps {
 	handleTemplateSubmit: (event: IEvent) => void;
 }
 
-type IProps = IOwnProps;
+interface IMappedProps {
+	fetchingInProgress: boolean;
+}
+
+type IProps = IOwnProps & IMappedProps;
 
 export const RenderList: React.SFC<IProps> = (props) => {
 	let itemList;
@@ -43,9 +51,17 @@ export const RenderList: React.SFC<IProps> = (props) => {
 				/>
 			);
 		});
-	return (
+	return !props.fetchingInProgress && list.length === 0 ? (
+		<div>{`No ${props.pageType === TemplateType.LIST_OF_COMMENTS ? `Comments` : `Posts`} to display`}</div>
+	) : (
 		<div>
 			{list}
 		</div>
 	)
 };
+
+const mapStateToProps: MapStateToProps<IMappedProps, {}, RootState> = (state: RootState, props: IProps) => ({
+	fetchingInProgress: state.posts.fetching || state.categories.fetching
+});
+
+export default withRouter<any>(connect(mapStateToProps)(RenderList));

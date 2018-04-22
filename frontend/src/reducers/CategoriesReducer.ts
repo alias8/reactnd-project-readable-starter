@@ -1,4 +1,4 @@
-import { ICategory, IPost } from '../types/types';
+import { ICategory } from '../types/types';
 import { Reducer } from 'redux';
 import { COMPLETE_FETCH_CATEGORIES, IAction, IN_PROGRESS_FETCH_CATEGORIES, UPDATE_CATEGORIES } from '../actions/actionTypes';
 

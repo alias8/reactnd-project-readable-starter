@@ -1,16 +1,11 @@
 import * as React from 'react';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
-import { ICategory, IComment, IPost, ShouldDisplayTopNav, TemplateType } from '../types/types';
+import { ICategory, ShouldDisplayTopNav, TemplateType } from '../types/types';
 import { NavLink } from 'react-router-dom';
-import { Component } from 'react';
 
 interface IMappedProps {
 	categories: ICategory[];
-}
-
-interface IState {
-
 }
 
 interface IOwnProps {
