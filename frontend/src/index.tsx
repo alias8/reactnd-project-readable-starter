@@ -5,9 +5,7 @@ import App from './components/App';
 import registerServiceWorker from './registerServiceWorker';
 import store from './store/store';
 import { Provider } from 'react-redux';
-import {
-    BrowserRouter as Router,
-    Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Switch } from 'react-router';
 import NewPost from './components/NewPost';
 import { NotFoundPage } from './components/NotFoundPage';

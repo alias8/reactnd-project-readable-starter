@@ -1,12 +1,11 @@
 import * as React from 'react';
-import * as API from '../api/api';
 import { ChangeEvent } from 'react';
-import { Redirect, RouteComponentProps } from 'react-router';
-import { ICategory, IPost, TemplateType } from '../types/types';
+import { Redirect } from 'react-router';
+import { ICategory, TemplateType } from '../types/types';
 import '../styles/App.scss';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import TopNav from './TopNav';
-import { addOnePostAction, APIAddNewPost } from '../actions/postActions';
+import { APIAddNewPost } from '../actions/postActions';
 import { RootState } from '../reducers/TopReducer';
 
 interface IState {
@@ -28,17 +27,6 @@ interface IOwnProps {
 type IProps = IOwnProps & IMappedProps & DispatchProp<{}>;
 
 export class NewPost extends React.Component<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            title: '',
-            text: '',
-            author: '',
-            chosenCategory: '',
-            postSubmitted: false
-        };
-    }
-
     handleSubmit = (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -49,29 +37,36 @@ export class NewPost extends React.Component<IProps, IState> {
             });
         }
     }
-
     handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
         this.setState({
             title: event.currentTarget.value
         });
     }
-
     handleAuthorChange = (event: ChangeEvent<HTMLInputElement>) => {
         this.setState({
             author: event.currentTarget.value
         });
     }
-
     handleTextChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         this.setState({
             text: event.currentTarget.value
         });
     }
-
     handleCategoryChange = (event: React.MouseEvent<HTMLButtonElement>) => {
         this.setState({
             chosenCategory: event.currentTarget.innerHTML
         });
+    }
+
+    constructor(props: IProps) {
+        super(props);
+        this.state = {
+            title: '',
+            text: '',
+            author: '',
+            chosenCategory: '',
+            postSubmitted: false
+        };
     }
 
     render() {
@@ -95,8 +90,8 @@ export class NewPost extends React.Component<IProps, IState> {
             return (
                 <div>
                     <TopNav
-						pageType={TemplateType.LIST_OF_POSTS}
-					/>
+                        pageType={TemplateType.LIST_OF_POSTS}
+                    />
                     <div className={'top-buffer'}/>
                     <hr className={'thick-hr'}/>
                     <div className={'new-post-container'}>

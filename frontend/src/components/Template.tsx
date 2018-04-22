@@ -42,14 +42,6 @@ export enum eventActions {
 type IProps = IOwnProps;
 
 export class Template extends React.Component<IProps, IState> {
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            editedTitle: this.props.title,
-            editedBody: this.props.body
-        };
-    }
-
     clickHandle = (event) => {
         const myEvent = {
             ...this.props,
@@ -59,14 +51,6 @@ export class Template extends React.Component<IProps, IState> {
         };
         this.props.onSubmit(myEvent);
     }
-
-    componentWillReceiveProps(nextProps: IProps) {
-        this.setState({
-            editedTitle: nextProps.title,
-            editedBody: nextProps.body
-        })
-    }
-
     handleChange = (event) => {
         switch (event.target.dataset.eventAction) {
             case eventActions.CHANGE_EDITED_TITLE:
@@ -83,6 +67,21 @@ export class Template extends React.Component<IProps, IState> {
         }
     }
 
+    constructor(props: IProps) {
+        super(props);
+        this.state = {
+            editedTitle: this.props.title,
+            editedBody: this.props.body
+        };
+    }
+
+    componentWillReceiveProps(nextProps: IProps) {
+        this.setState({
+            editedTitle: nextProps.title,
+            editedBody: nextProps.body
+        })
+    }
+
     render() {
         const textAreaClassNames = ['no-black-outline-textbox', 'post-title'];
         if (!this.props.beingEdited) {
@@ -94,14 +93,14 @@ export class Template extends React.Component<IProps, IState> {
             </Link>
         );
         const titleAsTextArea = (
-                <Textarea
-                    data-event-action={eventActions.CHANGE_EDITED_TITLE}
-                    value={this.state.editedTitle}
-                    readOnly={!this.props.beingEdited}
-                    onChange={this.handleChange}
-                    className={textAreaClassNames.join(' ')}
-                />
-            );
+            <Textarea
+                data-event-action={eventActions.CHANGE_EDITED_TITLE}
+                value={this.state.editedTitle}
+                readOnly={!this.props.beingEdited}
+                onChange={this.handleChange}
+                className={textAreaClassNames.join(' ')}
+            />
+        );
         let title;
         if (this.props.type === TemplateType.SINGLE_POST) {
             title = titleAsTextArea;

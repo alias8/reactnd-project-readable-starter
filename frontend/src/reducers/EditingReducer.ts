@@ -1,6 +1,5 @@
-import { ICategory, IPost } from '../types/types';
 import { Reducer } from 'redux';
-import { CHANGE_EDITED_ID, CHANGE_EDITED_TITLE, IAction, UPDATE_CATEGORIES } from '../actions/actionTypes';
+import { CHANGE_EDITED_ID, IAction } from '../actions/actionTypes';
 
 export type EditState = {
     beingEditedID: string;

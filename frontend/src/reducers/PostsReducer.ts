@@ -1,15 +1,24 @@
 import { IPost } from '../types/types';
 import { Reducer } from 'redux';
-import { ADD_ONE_POST, COMPLETE_FETCH_POSTS, DELETE_POST, EDIT_ONE_POST, IAction, IN_PROGRESS_FETCH_POSTS, UPDATE_POSTS, VOTE_ON_POST } from '../actions/actionTypes';
+import {
+    ADD_ONE_POST,
+    COMPLETE_FETCH_POSTS,
+    DELETE_POST,
+    EDIT_ONE_POST,
+    IAction,
+    IN_PROGRESS_FETCH_POSTS,
+    UPDATE_POSTS,
+    VOTE_ON_POST
+} from '../actions/actionTypes';
 
 export type PostState = {
     posts: IPost[]
-	fetching: boolean;
+    fetching: boolean;
 };
 
 const initialState: PostState = {
     posts: [],
-	fetching: false
+    fetching: false
 };
 
 const reducer: Reducer<PostState> = (state = initialState, action: IAction) => {
@@ -30,29 +39,29 @@ const reducer: Reducer<PostState> = (state = initialState, action: IAction) => {
                 posts: state.posts.map(post => post.id === action.post.id ? action.post : post)
             };
         case EDIT_ONE_POST:
-            const newPostList =  state.posts.filter(post => post.id !== action.post.id);
+            const newPostList = state.posts.filter(post => post.id !== action.post.id);
             newPostList.push(action.post);
             return {
                 ...state,
                 posts: newPostList
             };
         case ADD_ONE_POST:
-            const newPostList1 =  state.posts.filter(post => post.id !== action.post.id);
+            const newPostList1 = state.posts.filter(post => post.id !== action.post.id);
             newPostList1.push(action.post);
             return {
                 ...state,
                 posts: newPostList1
             };
-		case COMPLETE_FETCH_POSTS:
-			return {
-				...state,
-				fetching: false
-			};
-		case IN_PROGRESS_FETCH_POSTS:
-			return {
-				...state,
-				fetching: true
-			};
+        case COMPLETE_FETCH_POSTS:
+            return {
+                ...state,
+                fetching: false
+            };
+        case IN_PROGRESS_FETCH_POSTS:
+            return {
+                ...state,
+                fetching: true
+            };
         default:
             return state;
     }

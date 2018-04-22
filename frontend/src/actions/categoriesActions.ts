@@ -8,23 +8,23 @@ export const updateCategoriesAction = (categories: ICategory[]) => ({
 });
 
 const fetchingCategoriesInProgress = () => ({
-	type: IN_PROGRESS_FETCH_CATEGORIES
+    type: IN_PROGRESS_FETCH_CATEGORIES
 });
 
 const fetchingCategoriesComplete = () => ({
-	type: COMPLETE_FETCH_CATEGORIES
+    type: COMPLETE_FETCH_CATEGORIES
 });
 
 export const APIFetchCategories = () => {
     return (dispatch) => {
-		dispatch(fetchingCategoriesInProgress());
+        dispatch(fetchingCategoriesInProgress());
         API.fetchCategories()
             .then(result => {
                 dispatch(updateCategoriesAction(result));
-				dispatch(fetchingCategoriesComplete());
+                dispatch(fetchingCategoriesComplete());
             })
-			.catch((result) => {
-        		dispatch(fetchingCategoriesComplete());
-			})
+            .catch((result) => {
+                dispatch(fetchingCategoriesComplete());
+            })
     };
 };

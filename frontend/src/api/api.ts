@@ -129,6 +129,7 @@ export function voteOnPost(id: string, vote: string): Promise<IPost> {
             throw error;
         });
 }
+
 //
 
 export function editDetailsOfExistingPost(id: string, title: string, body: string): Promise<IPost> {
