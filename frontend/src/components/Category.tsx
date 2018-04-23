@@ -25,7 +25,7 @@ export const Category: React.SFC<IProps> = (props) => {
 			pageType={TemplateType.LIST_OF_POSTS}
 			listOfPosts={props.posts}
 		/>
-	)
+	);
 };
 
 const mapStateToProps: MapStateToProps<IMappedProps, {}, RootState> = (state: RootState, props: IProps) => {
@@ -37,7 +37,7 @@ const mapStateToProps: MapStateToProps<IMappedProps, {}, RootState> = (state: Ro
 	return {
 		posts: state.posts.posts.filter(post => post.category === props.match.params.category),
 		wrongRoute
-	}
+	};
 };
 
 export default withRouter<any>(connect(mapStateToProps)(Category));

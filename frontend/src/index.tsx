@@ -13,16 +13,16 @@ import Category from './components/Category';
 import PostPage from './components/PostPage';
 
 ReactDOM.render(
-    <Provider store={store}>
-        <Router>
-            <Switch>
-                <Route exact={true} path={'/new'} component={NewPost}/>
-                <Route exact={true} path={'/'} component={App}/>
-                <Route exact={true} path={'/404'} component={NotFoundPage}/>
-                <Route exact={true} path={'/:category/'} component={Category}/>
-                <Route exact={true} path={'/:category/:id'} component={PostPage}/>
-            </Switch>
-        </Router>
-    </Provider>,
-    document.getElementById('root'));
+	<Provider store={store}>
+		<Router>
+			<Switch>
+				<Route exact={true} path={'/new'} component={NewPost}/>
+				<Route exact={true} path={'/'} component={App}/>
+				<Route exact={true} path={'/404'} component={NotFoundPage}/>
+				<Route exact={true} path={'/:category/'} component={Category}/>
+				<Route exact={true} path={'/:category/:id'} component={PostPage}/>
+			</Switch>
+		</Router>
+	</Provider>,
+	document.getElementById('root'));
 registerServiceWorker();

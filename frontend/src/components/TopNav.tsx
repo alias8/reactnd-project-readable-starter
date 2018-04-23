@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { connect, DispatchProp, MapStateToProps } from 'react-redux';
+import { connect, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
 import { ICategory, ShouldDisplayTopNav, TemplateType } from '../types/types';
 import { NavLink } from 'react-router-dom';
@@ -9,10 +9,10 @@ interface IMappedProps {
 }
 
 interface IOwnProps {
-	pageType: TemplateType
+	pageType: TemplateType;
 }
 
-type IProps = IOwnProps & IMappedProps & DispatchProp<{}>;
+type IProps = IOwnProps & IMappedProps;
 
 export const TopNav: React.SFC<IProps> = (props) => {
 	const formLinksFromCategories = () => {
@@ -48,7 +48,6 @@ export const TopNav: React.SFC<IProps> = (props) => {
 		return categoryLinks;
 	};
 
-
 	return ShouldDisplayTopNav[props.pageType] ? (
 		<div>
 			<div className={'top-navlink-container'}>
@@ -58,7 +57,6 @@ export const TopNav: React.SFC<IProps> = (props) => {
 	) : (
 		<div/>
 	);
-
 
 };
 

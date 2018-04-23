@@ -15,7 +15,7 @@ export const IN_PROGRESS_FETCH_POSTS = 'IN_PROGRESS_FETCH_POSTS';
 export const COMPLETE_FETCH_POSTS = 'COMPLETE_FETCH_POSTS';
 
 export interface IAction {
-    type: string;
+	type: string;
 
-    [propName: string]: any;
+	[propName: string]: any;
 }

@@ -4,15 +4,15 @@ import categories, { CategoriesState } from './CategoriesReducer';
 import editing, { EditState } from './EditingReducer';
 
 export type RootState = {
-    posts: PostState,
-    categories: CategoriesState
-    beingEdited: EditState
+	posts: PostState,
+	categories: CategoriesState
+	beingEdited: EditState
 };
 
 const topLevelReducer: Reducer<RootState> = combineReducers<RootState>({
-    posts: posts,
-    categories: categories,
-    beingEdited: editing
+	posts: posts,
+	categories: categories,
+	beingEdited: editing
 });
 
 export default topLevelReducer;

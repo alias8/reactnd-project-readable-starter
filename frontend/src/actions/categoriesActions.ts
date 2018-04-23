@@ -3,28 +3,28 @@ import { COMPLETE_FETCH_CATEGORIES, IN_PROGRESS_FETCH_CATEGORIES, UPDATE_CATEGOR
 import * as API from '../api/api';
 
 export const updateCategoriesAction = (categories: ICategory[]) => ({
-    type: UPDATE_CATEGORIES,
-    categories: categories
+	type: UPDATE_CATEGORIES,
+	categories: categories
 });
 
 const fetchingCategoriesInProgress = () => ({
-    type: IN_PROGRESS_FETCH_CATEGORIES
+	type: IN_PROGRESS_FETCH_CATEGORIES
 });
 
 const fetchingCategoriesComplete = () => ({
-    type: COMPLETE_FETCH_CATEGORIES
+	type: COMPLETE_FETCH_CATEGORIES
 });
 
 export const APIFetchCategories = () => {
-    return (dispatch) => {
-        dispatch(fetchingCategoriesInProgress());
-        API.fetchCategories()
-            .then(result => {
-                dispatch(updateCategoriesAction(result));
-                dispatch(fetchingCategoriesComplete());
-            })
-            .catch((result) => {
-                dispatch(fetchingCategoriesComplete());
-            })
-    };
+	return (dispatch) => {
+		dispatch(fetchingCategoriesInProgress());
+		API.fetchCategories()
+			.then(result => {
+				dispatch(updateCategoriesAction(result));
+				dispatch(fetchingCategoriesComplete());
+			})
+			.catch((result) => {
+				dispatch(fetchingCategoriesComplete());
+			})
+	};
 };
