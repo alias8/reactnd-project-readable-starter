@@ -14,7 +14,7 @@ interface IOwnProps {
 
 type IProps = IOwnProps & IMappedProps;
 
-export const TopNav: React.SFC<IProps> = (props) => {
+const TopNav: React.SFC<IProps> = (props) => {
 	const formLinksFromCategories = () => {
 		let categoryLinks: any = [];
 		categoryLinks.push(

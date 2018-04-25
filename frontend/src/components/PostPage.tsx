@@ -48,7 +48,7 @@ export class PostPage extends React.Component<IProps, IState> {
 
 	render() {
 		return this.props.wrongRoute ? (
-			<Redirect to={'/'}/>
+			<Redirect to={'/404'}/>
 		) : (
 			<div>
 				<PostOrCommentCollection
@@ -66,13 +66,13 @@ export class PostPage extends React.Component<IProps, IState> {
 }
 
 const mapStateToProps: MapStateToProps<IMappedProps, {}, RootState> = (state: RootState, props: IProps) => {
-	const filteredPosts = state.posts.posts.filter(post => post.id === props.match.params.id);
-	const wrongRoute = state.posts.posts.length > 0 && filteredPosts.length === 0
+	const originalParentPost = state.posts.posts.filter(post => post.id === props.match.params.id);
+	const wrongRoute = state.posts.posts.length > 0 && originalParentPost.length === 0
 		|| state.posts.posts.length === 0 && !state.posts.fetching;
 	return {
-		originalParentPost: filteredPosts,
+		originalParentPost,
 		categories: state.categories.categories,
-		wrongRoute: wrongRoute
+		wrongRoute
 	};
 };
 

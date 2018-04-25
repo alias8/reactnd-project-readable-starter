@@ -16,13 +16,17 @@ ReactDOM.render(
 	<Provider store={store}>
 		<Router>
 			<Switch>
-				<Route exact={true} path={'/new'} component={NewPost}/>
 				<Route exact={true} path={'/'} component={App}/>
 				<Route exact={true} path={'/404'} component={NotFoundPage}/>
 				<Route exact={true} path={'/:category/'} component={Category}/>
 				<Route exact={true} path={'/:category/:id'} component={PostPage}/>
+				<Route exact={true} path={'/new'} component={NewPost}/>
 			</Switch>
 		</Router>
 	</Provider>,
 	document.getElementById('root'));
 registerServiceWorker();
+
+// todo:
+// use this library to make this more visually appealing http://www.material-ui.com/#/
+// have a loading symbol while API calls are being made
