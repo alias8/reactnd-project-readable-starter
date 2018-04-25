@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { sortType } from './TemplateCollection';
+import { sortType } from './PostOrCommentCollection';
 import { ShouldDisplaySort, TemplateType } from '../types/types';
 
 interface IOwnProps {

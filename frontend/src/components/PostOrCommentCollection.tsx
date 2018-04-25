@@ -3,17 +3,17 @@ import { Component } from 'react';
 import { ICategory, IComment, IPost, TemplateType } from '../types/types';
 import { connect, DispatchProp, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
-import { eventActions, IEvent } from './Template';
+import { eventActions, IEvent } from './PostOrCommentContainer';
 import * as API from '../api/api';
 import TopNav from './TopNav';
 import { APIDeletePost, APIEditDetailsOfExistingPost, APIFetchPosts, APIVoteOnPost, } from '../actions/postActions';
 import { APIFetchCategories } from '../actions/categoriesActions';
 import { changeEditedID } from '../actions/editingActions';
 import { APIDeleteComment } from '../actions/commentActions';
-import RenderList from "./RenderList";
-import { SortContainer } from "./SortContainer";
-import { NewCommentContainer } from "./NewCommentContainer";
-import { AddNewPost } from "./AddNewPost";
+import ListOfPostsOrComments from './ListOfPostsOrComments';
+import { SortContainer } from './SortContainer';
+import { NewCommentContainer } from './NewCommentContainer';
+import { AddNewPost } from './AddNewPost';
 
 export enum sortType {
 	VOTE_SCORE = 'VOTE_SCORE',
@@ -40,7 +40,7 @@ interface IOwnProps {
 
 type IProps = IOwnProps & IMappedProps & DispatchProp<{}>;
 
-class TemplateCollection extends Component<IProps, IState> {
+class PostOrCommentCollection extends Component<IProps, IState> {
 	constructor(props: IProps) {
 		super(props);
 		this.state = {
@@ -55,7 +55,7 @@ class TemplateCollection extends Component<IProps, IState> {
 		this.setState({
 			sortMethod: (e.currentTarget.value as sortType)
 		});
-	};
+	}
 	handleTemplateSubmit = (event: IEvent) => {
 		switch (event.action) {
 			case eventActions.UPVOTE:
@@ -103,7 +103,7 @@ class TemplateCollection extends Component<IProps, IState> {
 				break;
 			default:
 		}
-	};
+	}
 	updateNewComment = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
 		switch (event.target.dataset.eventAction) {
 			case eventActions.CHANGE_NEW_COMMENT_BODY:
@@ -118,7 +118,7 @@ class TemplateCollection extends Component<IProps, IState> {
 				break;
 			default:
 		}
-	};
+	}
 	submitNewComment = () => {
 		if (this.state.newCommentBody !== '' && this.state.newCommentAuthor !== '') {
 			API.postCommentToPost(this.state.newCommentAuthor, this.state.newCommentBody, this.props.parentPostID)
@@ -131,7 +131,7 @@ class TemplateCollection extends Component<IProps, IState> {
 				});
 			this.props.dispatch(APIFetchPosts());
 		}
-	};
+	}
 
 	componentDidMount() {
 		this.props.dispatch(APIFetchPosts());
@@ -176,7 +176,7 @@ class TemplateCollection extends Component<IProps, IState> {
 				/>
 				<div className={'main-flex-container'}>
 					<div className={'post-list'}>
-						<RenderList
+						<ListOfPostsOrComments
 							pageType={this.props.pageType}
 							sortMethod={this.state.sortMethod}
 							beingEditedID={this.props.beingEditedID}
@@ -201,4 +201,4 @@ const mapStateToProps: MapStateToProps<IMappedProps, IOwnProps, RootState> = (st
 	beingEditedID: state.beingEdited.beingEditedID,
 });
 
-export default connect(mapStateToProps)(TemplateCollection);
+export default connect(mapStateToProps)(PostOrCommentCollection);

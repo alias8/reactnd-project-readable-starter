@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { IComment, IPost, TemplateType } from '../types/types';
-import { sortType } from './TemplateCollection';
-import { IEvent, Template } from './Template';
+import { sortType } from './PostOrCommentCollection';
+import { IEvent, PostOrCommentContainer } from './PostOrCommentContainer';
 import { connect, MapStateToProps } from 'react-redux';
 import { withRouter } from 'react-router';
 import { RootState } from '../reducers/TopReducer';
@@ -21,7 +21,7 @@ interface IMappedProps {
 
 type IProps = IOwnProps & IMappedProps;
 
-const RenderList: React.SFC<IProps> = (props) => {
+const ListOfPostsOrComments: React.SFC<IProps> = (props) => {
 	let itemList;
 	itemList = props.pageType === TemplateType.LIST_OF_COMMENTS ? props.listOfComments : props.listOfPosts;
 	const list =
@@ -34,7 +34,7 @@ const RenderList: React.SFC<IProps> = (props) => {
 				const beingEdited = props.beingEditedID === post.id;
 				const {id, category, title, body, timestamp, author, voteScore, commentCount} = post;
 				return (
-					<Template
+					<PostOrCommentContainer
 						ID={id}
 						category={category}
 						title={title}
@@ -63,4 +63,4 @@ const mapStateToProps: MapStateToProps<IMappedProps, {}, RootState> = (state: Ro
 	fetchingInProgress: state.posts.fetching || state.categories.fetching
 });
 
-export default connect(mapStateToProps)(RenderList);
+export default connect(mapStateToProps)(ListOfPostsOrComments);

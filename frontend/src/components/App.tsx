@@ -5,7 +5,7 @@ import { IPost, TemplateType } from '../types/types';
 import { RootState } from '../reducers/TopReducer';
 import { RouteComponentProps } from 'react-router';
 import '../styles/App.scss';
-import TemplateCollection from './TemplateCollection';
+import { default as PostOrCommentCollection } from './PostOrCommentCollection';
 
 interface IMappedProps {
 	posts: IPost[];
@@ -14,7 +14,7 @@ interface IMappedProps {
 type IProps = IMappedProps;
 
 const App: React.SFC<IProps> = (props) => (
-	<TemplateCollection
+	<PostOrCommentCollection
 		pageType={TemplateType.LIST_OF_POSTS}
 		listOfPosts={props.posts}
 	/>

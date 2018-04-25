@@ -4,7 +4,7 @@ import { Redirect, RouteComponentProps, withRouter } from 'react-router';
 import { connect, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
 import '../styles/App.scss';
-import TemplateCollection from './TemplateCollection';
+import { default as PostOrCommentCollection } from './PostOrCommentCollection';
 
 interface IState {
 	sortMethod: string;
@@ -48,14 +48,14 @@ export class PostPage extends React.Component<IProps, IState> {
 
 	render() {
 		return this.props.wrongRoute ? (
-			<Redirect to={'/404'}/>
+			<Redirect to={'/'}/>
 		) : (
 			<div>
-				<TemplateCollection
+				<PostOrCommentCollection
 					pageType={TemplateType.SINGLE_POST}
 					listOfPosts={this.props.originalParentPost}
 				/>
-				<TemplateCollection
+				<PostOrCommentCollection
 					pageType={TemplateType.LIST_OF_COMMENTS}
 					parentPostID={this.state.originalParentPostId}
 					listOfPosts={[]}
@@ -67,7 +67,8 @@ export class PostPage extends React.Component<IProps, IState> {
 
 const mapStateToProps: MapStateToProps<IMappedProps, {}, RootState> = (state: RootState, props: IProps) => {
 	const filteredPosts = state.posts.posts.filter(post => post.id === props.match.params.id);
-	const wrongRoute = state.posts.posts.length > 0 && filteredPosts.length === 0;
+	const wrongRoute = state.posts.posts.length > 0 && filteredPosts.length === 0
+		|| state.posts.posts.length === 0 && !state.posts.fetching;
 	return {
 		originalParentPost: filteredPosts,
 		categories: state.categories.categories,

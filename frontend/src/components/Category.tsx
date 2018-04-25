@@ -4,7 +4,7 @@ import { connect, MapStateToProps } from 'react-redux';
 import { RootState } from '../reducers/TopReducer';
 import { IPost, TemplateType } from '../types/types';
 import '../styles/App.scss';
-import TemplateCollection from './TemplateCollection';
+import { default as PostOrCommentCollection } from './PostOrCommentCollection';
 
 interface IMappedProps {
 	posts: IPost[];
@@ -21,7 +21,7 @@ export const Category: React.SFC<IProps> = (props) => {
 	return props.wrongRoute ? (
 		<Redirect to={'/404'}/>
 	) : (
-		<TemplateCollection
+		<PostOrCommentCollection
 			pageType={TemplateType.LIST_OF_POSTS}
 			listOfPosts={props.posts}
 		/>

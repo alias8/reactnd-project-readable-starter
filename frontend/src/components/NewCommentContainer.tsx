@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { TemplateType } from '../types/types';
-import { eventActions } from './Template';
+import { eventActions } from './PostOrCommentContainer';
 import Textarea from 'react-textarea-autosize';
 
 interface IOwnProps {

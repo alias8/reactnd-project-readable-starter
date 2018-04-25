@@ -41,7 +41,7 @@ export enum eventActions {
 
 type IProps = IOwnProps;
 
-export class Template extends React.Component<IProps, IState> {
+export class PostOrCommentContainer extends React.Component<IProps, IState> {
 	constructor(props: IProps) {
 		super(props);
 		this.state = {
