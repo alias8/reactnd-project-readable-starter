@@ -25,6 +25,6 @@ export const APIFetchCategories = () => {
 			})
 			.catch((result) => {
 				dispatch(fetchingCategoriesComplete());
-			})
+			});
 	};
 };

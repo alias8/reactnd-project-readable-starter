@@ -34,7 +34,7 @@ export class NewPost extends React.Component<IProps, IState> {
 		};
 	}
 
-	handleSubmit = (event) => {
+	handleSubmit = (event: any) => {
 		event.preventDefault();
 		event.stopPropagation();
 		if (this.state.chosenCategory !== '') {

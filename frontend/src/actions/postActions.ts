@@ -89,6 +89,6 @@ export const APIFetchPosts = () => {
 			})
 			.catch((result) => {
 				dispatch(fetchingPostsComplete());
-			})
-	}
+			});
+	};
 };

@@ -45,7 +45,7 @@ export class PostOrCommentContainer extends React.Component<IProps, IState> {
 	constructor(props: IProps) {
 		super(props);
 		this.state = {
-			editedTitle: this.props.title,
+			editedTitle: this.props.title ? this.props.title : '',
 			editedBody: this.props.body
 		};
 	}
@@ -78,7 +78,7 @@ export class PostOrCommentContainer extends React.Component<IProps, IState> {
 
 	componentWillReceiveProps(nextProps: IProps) {
 		this.setState({
-			editedTitle: nextProps.title,
+			editedTitle: nextProps.title ? nextProps.title : '',
 			editedBody: nextProps.body
 		});
 	}

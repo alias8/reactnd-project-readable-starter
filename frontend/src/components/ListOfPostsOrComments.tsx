@@ -3,7 +3,6 @@ import { IComment, IPost, TemplateType } from '../types/types';
 import { sortType } from './PostOrCommentCollection';
 import { IEvent, PostOrCommentContainer } from './PostOrCommentContainer';
 import { connect, MapStateToProps } from 'react-redux';
-import { withRouter } from 'react-router';
 import { RootState } from '../reducers/TopReducer';
 
 interface IOwnProps {

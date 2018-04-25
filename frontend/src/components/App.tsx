@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { withRouter } from 'react-router-dom';
 import { connect, MapStateToProps } from 'react-redux';
 import { IPost, TemplateType } from '../types/types';
 import { RootState } from '../reducers/TopReducer';
-import { RouteComponentProps } from 'react-router';
 import '../styles/App.scss';
 import { default as PostOrCommentCollection } from './PostOrCommentCollection';
 
