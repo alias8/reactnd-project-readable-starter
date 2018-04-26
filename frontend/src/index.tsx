@@ -30,3 +30,4 @@ registerServiceWorker();
 // todo:
 // use this library to make this more visually appealing http://www.material-ui.com/#/
 // have a loading symbol while API calls are being made
+// do not use array index as keys, as reordering of lists can mess up react's reconciliation of what changed
